@@ -91,15 +91,15 @@ function clearAccessExpiredFlag() {
   try { sessionStorage.removeItem(ACCESS_EXPIRED_FLAG); } catch {}
 }
 
-const GITHUB_URL = 'https://github.com/wenbin-wb/dsh-bridge';
-const RELEASES_URL = 'https://github.com/wenbin-wb/dsh-bridge/releases';
-const ISSUES_URL = 'https://github.com/wenbin-wb/dsh-bridge/issues/new';
-const TUNNEL_DOCS_URL = 'https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/custom-tunnel.md';
-const CLOUDFLARE_TUTORIAL_URL = 'https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/cloudflare-fixed-domain.md';
+const GITHUB_URL = 'https://github.com/lejlm233/dsh-bridge';
+const RELEASES_URL = 'https://github.com/lejlm233/dsh-bridge/releases';
+const ISSUES_URL = 'https://github.com/lejlm233/dsh-bridge/issues/new';
+const TUNNEL_DOCS_URL = 'https://github.com/lejlm233/dsh-bridge/blob/main/docs/custom-tunnel.md';
+const CLOUDFLARE_TUTORIAL_URL = 'https://github.com/lejlm233/dsh-bridge/blob/main/docs/cloudflare-fixed-domain.md';
 
 // 生成升级命令（拼接具体版本号；用 add 而非 update，update --latest 受已安装依赖版本约束可能无法升级到最新版）
 function upgradeCommands(latest) {
-  const spec = `@wenbin_wb/dsh-bridge@${latest}`;
+  const spec = `@lejlm233/dsh-bridge@${latest}`;
   return [
     { id: 'dsh',    cmd: `dsh plugin --profile web add ${spec}` },
     { id: 'npx',    cmd: `npx --yes @deepseek-ai/dsh plugin --profile web add ${spec}` },
@@ -1817,12 +1817,12 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall }) {
     // 快捷入口：使用说明 / 开放平台 / 命令速查
     React.createElement('div', { style: { display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' } },
       platformId === 'wechat' && React.createElement('a', {
-        href: 'https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/wechat-usage.md',
+        href: 'https://github.com/lejlm233/dsh-bridge/blob/main/docs/wechat-usage.md',
         target: '_blank', rel: 'noopener noreferrer',
         style: s.btnGhost,
       }, '📖 微信使用说明'),
       platformId === 'qq' && React.createElement('a', {
-        href: 'https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/qq-usage.md',
+        href: 'https://github.com/lejlm233/dsh-bridge/blob/main/docs/qq-usage.md',
         target: '_blank', rel: 'noopener noreferrer',
         style: s.btnGhost,
       }, '📖 QQ 使用说明'),
@@ -1832,7 +1832,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall }) {
         style: s.btnGhost,
       }, '🌐 QQ 开放平台'),
       platformId === 'feishu' && React.createElement('a', {
-        href: 'https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/feishu-usage.md',
+        href: 'https://github.com/lejlm233/dsh-bridge/blob/main/docs/feishu-usage.md',
         target: '_blank', rel: 'noopener noreferrer',
         style: s.btnGhost,
       }, '📖 飞书使用说明'),
@@ -1842,7 +1842,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall }) {
         style: s.btnGhost,
       }, '🌐 飞书开放平台'),
       platformId === 'telegram' && React.createElement('a', {
-        href: 'https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/telegram-usage.md',
+        href: 'https://github.com/lejlm233/dsh-bridge/blob/main/docs/telegram-usage.md',
         target: '_blank', rel: 'noopener noreferrer',
         style: s.btnGhost,
       }, '📖 Telegram 使用说明'),
@@ -4007,8 +4007,8 @@ function injectMobileStyles() {
   // 归属标记（Issue #24）：本样式由 apply() 运行时创建，晚于宿主的 claimStyles
   // 物化阶段——若不声明归属，宿主会把无主 <style> 认领给其它插件，HMR 重载时
   // 误删整张样式表，导致移动端导航条在桌面端泄漏（≡/新会话/⊕ 元素）
-  style.dataset.plugin = '@wenbin_wb/dsh-bridge';
-  style.dataset.pluginCss = '@wenbin_wb/dsh-bridge/mobile-styles';
+  style.dataset.plugin = '@lejlm233/dsh-bridge';
+  style.dataset.pluginCss = '@lejlm233/dsh-bridge/mobile-styles';
   style.textContent = MOBILE_STYLES_CSS;
   document.head.appendChild(style);
 }

@@ -204,7 +204,7 @@
 
 ## 8. Issue #28 修复记录（DSH 原生端口 3080 直连被误判远程）
 
-**issue**：[#28](https://github.com/wenbin-wb/dsh-bridge/issues/28) — dsh 0.1.2-alpha.5 下 127.0.0.1:3080 被判定为远程 + 本机文件夹选择走远程抽屉（0 回复，经代码核查确认为真问题）。
+**issue**：上游仓库 issue #28（原 dsh-bridge 仓库）— dsh 0.1.2-alpha.5 下 127.0.0.1:3080 被判定为远程 + 本机文件夹选择走远程抽屉（0 回复，经代码核查确认为真问题）。
 
 **根因（现象 1，已修复）**：
 - `/__dsh_bridge__/loopback-token`（本机领 adminToken 端点）只注册在代理端口 3082（lib/index.js ProxyServer），DSH 原生端口 3080 无此端点；

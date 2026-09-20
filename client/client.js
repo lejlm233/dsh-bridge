@@ -1,5 +1,5 @@
 window.__ModuleLoader__.load({
-  id: "@wenbin_wb/dsh-bridge",
+  id: "@lejlm233/dsh-bridge",
   factory: (require) => {
     var module = { exports: {} };
     var exports = module.exports;
@@ -1251,13 +1251,13 @@ function clearAccessExpiredFlag() {
   } catch {
   }
 }
-var GITHUB_URL = "https://github.com/wenbin-wb/dsh-bridge";
-var RELEASES_URL = "https://github.com/wenbin-wb/dsh-bridge/releases";
-var ISSUES_URL = "https://github.com/wenbin-wb/dsh-bridge/issues/new";
-var TUNNEL_DOCS_URL = "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/custom-tunnel.md";
-var CLOUDFLARE_TUTORIAL_URL = "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/cloudflare-fixed-domain.md";
+var GITHUB_URL = "https://github.com/lejlm233/dsh-bridge";
+var RELEASES_URL = "https://github.com/lejlm233/dsh-bridge/releases";
+var ISSUES_URL = "https://github.com/lejlm233/dsh-bridge/issues/new";
+var TUNNEL_DOCS_URL = "https://github.com/lejlm233/dsh-bridge/blob/main/docs/custom-tunnel.md";
+var CLOUDFLARE_TUTORIAL_URL = "https://github.com/lejlm233/dsh-bridge/blob/main/docs/cloudflare-fixed-domain.md";
 function upgradeCommands(latest) {
-  const spec = `@wenbin_wb/dsh-bridge@${latest}`;
+  const spec = `@lejlm233/dsh-bridge@${latest}`;
   return [
     { id: "dsh", cmd: `dsh plugin --profile web add ${spec}` },
     { id: "npx", cmd: `npx --yes @deepseek-ai/dsh plugin --profile web add ${spec}` }
@@ -3154,13 +3154,13 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall }) {
       "div",
       { style: { display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap", alignItems: "center" } },
       platformId === "wechat" && React.createElement("a", {
-        href: "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/wechat-usage.md",
+        href: "https://github.com/lejlm233/dsh-bridge/blob/main/docs/wechat-usage.md",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
       }, "\u{1F4D6} \u5FAE\u4FE1\u4F7F\u7528\u8BF4\u660E"),
       platformId === "qq" && React.createElement("a", {
-        href: "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/qq-usage.md",
+        href: "https://github.com/lejlm233/dsh-bridge/blob/main/docs/qq-usage.md",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
@@ -3172,7 +3172,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall }) {
         style: s.btnGhost
       }, "\u{1F310} QQ \u5F00\u653E\u5E73\u53F0"),
       platformId === "feishu" && React.createElement("a", {
-        href: "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/feishu-usage.md",
+        href: "https://github.com/lejlm233/dsh-bridge/blob/main/docs/feishu-usage.md",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
@@ -3184,7 +3184,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall }) {
         style: s.btnGhost
       }, "\u{1F310} \u98DE\u4E66\u5F00\u653E\u5E73\u53F0"),
       platformId === "telegram" && React.createElement("a", {
-        href: "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/telegram-usage.md",
+        href: "https://github.com/lejlm233/dsh-bridge/blob/main/docs/telegram-usage.md",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
@@ -5581,8 +5581,8 @@ function injectMobileStyles() {
   if (document.getElementById("dsh-bridge-mobile-styles")) return;
   const style = document.createElement("style");
   style.id = "dsh-bridge-mobile-styles";
-  style.dataset.plugin = "@wenbin_wb/dsh-bridge";
-  style.dataset.pluginCss = "@wenbin_wb/dsh-bridge/mobile-styles";
+  style.dataset.plugin = "@lejlm233/dsh-bridge";
+  style.dataset.pluginCss = "@lejlm233/dsh-bridge/mobile-styles";
   style.textContent = MOBILE_STYLES_CSS;
   document.head.appendChild(style);
 }

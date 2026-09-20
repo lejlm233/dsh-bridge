@@ -4,7 +4,7 @@
 
 ## 环境信息
 
-- **dsh-bridge 版本**：（设置页可查看，或 `npm ls @wenbin_wb/dsh-bridge`）
+- **dsh-bridge 版本**：（设置页可查看，或 `npm ls @lejlm233/dsh-bridge`）
 - **DSH 版本**：`dsh --version` 或安装方式（npx @deepseek-ai/dsh web）
 - **Node 版本**：`node -v`
 - **操作系统**：Windows / macOS / Linux（含版本）

@@ -4,7 +4,7 @@
 
 ## 负责任披露流程
 
-1. **私密报告**：通过 GitHub 的 [Security Advisory](https://github.com/wenbin-wb/dsh-bridge/security/advisories/new)（需要仓库权限）或发送邮件至维护者（见仓库主页），**不要**提交公开 Issue；
+1. **私密报告**：通过 GitHub 的 [Security Advisory](https://github.com/lejlm233/dsh-bridge/security/advisories/new)（需要仓库权限）或发送邮件至维护者（见仓库主页），**不要**提交公开 Issue；
 2. **响应承诺**：通常在 48 小时内确认收到，评估后给出修复时间表；
 3. **协调披露**：修复发布后，我们会公开漏洞详情（CVE 或 Advisory），并致谢报告者（如你愿意署名）。
 

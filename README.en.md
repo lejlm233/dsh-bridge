@@ -5,12 +5,12 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@wenbin_wb/dsh-bridge"><img src="https://img.shields.io/npm/v/@wenbin_wb/dsh-bridge.svg?style=flat-square&color=38bdf8&logo=npm" alt="npm version" /></a>
-  <a href="https://www.npmjs.com/package/@wenbin_wb/dsh-bridge"><img src="https://img.shields.io/npm/dt/@wenbin_wb/dsh-bridge.svg?style=flat-square&color=fbbf24&logo=npm" alt="npm downloads" /></a>
-  <a href="https://github.com/wenbin-wb/dsh-bridge/releases"><img src="https://img.shields.io/github/v/release/wenbin-wb/dsh-bridge?style=flat-square&color=10b981&logo=github" alt="GitHub release" /></a>
-  <a href="https://github.com/wenbin-wb/dsh-bridge/stargazers"><img src="https://img.shields.io/github/stars/wenbin-wb/dsh-bridge?style=flat-square&color=f43f5e&logo=github" alt="GitHub stars" /></a>
+  <a href="https://www.npmjs.com/package/@lejlm233/dsh-bridge"><img src="https://img.shields.io/npm/v/@lejlm233/dsh-bridge.svg?style=flat-square&color=38bdf8&logo=npm" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/@lejlm233/dsh-bridge"><img src="https://img.shields.io/npm/dt/@lejlm233/dsh-bridge.svg?style=flat-square&color=fbbf24&logo=npm" alt="npm downloads" /></a>
+  <a href="https://github.com/lejlm233/dsh-bridge/releases"><img src="https://img.shields.io/github/v/release/lejlm233/dsh-bridge?style=flat-square&color=10b981&logo=github" alt="GitHub release" /></a>
+  <a href="https://github.com/lejlm233/dsh-bridge/stargazers"><img src="https://img.shields.io/github/stars/lejlm233/dsh-bridge?style=flat-square&color=f43f5e&logo=github" alt="GitHub stars" /></a>
   <a href="https://nodejs.org/"><img src="https://img.shields.io/badge/Node.js-%E2%89%A522.19%20%7C%20%E2%89%A524-339933?style=flat-square&logo=node.js" alt="Node.js version" /></a>
-  <a href="LICENSE"><img src="https://img.shields.io/npm/l/@wenbin_wb/dsh-bridge?style=flat-square&color=a855f7" alt="license" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/npm/l/@lejlm233/dsh-bridge?style=flat-square&color=a855f7" alt="license" /></a>
 </p>
 
 <p align="center">
@@ -96,13 +96,13 @@ This plugin supports **both old and new DSH releases** — there is no need to p
 
 ```bash
 # Method 1: Install from npm (Recommended)
-dsh plugin --profile web add @wenbin_wb/dsh-bridge
+dsh plugin --profile web add @lejlm233/dsh-bridge
 
 # Method 2: Global-permission-free npx installation
-npx --yes @deepseek-ai/dsh plugin --profile web add @wenbin_wb/dsh-bridge
+npx --yes @deepseek-ai/dsh plugin --profile web add @lejlm233/dsh-bridge
 
 # Method 3: Install from source
-git clone https://github.com/wenbin-wb/dsh-bridge.git
+git clone https://github.com/lejlm233/dsh-bridge.git
 dsh plugin --profile web add ./dsh-bridge
 ```
 
@@ -112,7 +112,7 @@ dsh plugin --profile web add ./dsh-bridge
 # Recommended: Click "🚀 1-Click Upgrade & Restart" in Web Settings > Remote Access
 
 # Or force install latest version via CLI:
-dsh plugin --profile web add @wenbin_wb/dsh-bridge@latest
+dsh plugin --profile web add @lejlm233/dsh-bridge@latest
 ```
 
 ---
@@ -404,7 +404,7 @@ Contributions are welcome! Feel free to submit an Issue or Pull Request.
 
 ```bash
 # 1. Clone repo
-git clone https://github.com/wenbin-wb/dsh-bridge.git
+git clone https://github.com/lejlm233/dsh-bridge.git
 cd dsh-bridge
 
 # 2. Install dependencies & build
@@ -422,11 +422,11 @@ dsh plugin --profile web add .
 
 ## ⭐ Star History
 
-<a href="https://www.star-history.com/?repos=wenbin-wb%2Fdsh-bridge&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=lejlm233%2Fdsh-bridge&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=wenbin-wb/dsh-bridge&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=wenbin-wb/dsh-bridge&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=wenbin-wb/dsh-bridge&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=lejlm233/dsh-bridge&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=lejlm233/dsh-bridge&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=lejlm233/dsh-bridge&type=date&legend=top-left" />
  </picture>
 </a>
 
@@ -434,4 +434,4 @@ dsh plugin --profile web add .
 
 ## 📄 License
 
-MIT © [wenbin-wb](https://github.com/wenbin-wb)
+MIT © 2024 wenbin-wb · 2026 [lejlm233](https://github.com/lejlm233)

@@ -53,7 +53,7 @@ async function createRelease() {
     prerelease: false,
   };
 
-  const res = await fetch('https://api.github.com/repos/wenbin-wb/dsh-bridge/releases', {
+  const res = await fetch('https://api.github.com/repos/lejlm233/dsh-bridge/releases', {
     method: 'POST',
     headers: {
       Accept: 'application/vnd.github+json',
