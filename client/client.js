@@ -1077,6 +1077,10 @@ var BRIDGE_ENDPOINTS = {
   stopCloudflared: "stopCloudflared",
   resetCloudflared: "resetCloudflared",
   saveCloudflaredConfig: "saveCloudflaredConfig",
+  startMefrp: "startMefrp",
+  stopMefrp: "stopMefrp",
+  resetMefrp: "resetMefrp",
+  saveMefrpConfig: "saveMefrpConfig",
   setTunnelAutoStart: "setTunnelAutoStart",
   saveCustomTunnelConfig: "saveCustomTunnelConfig",
   saveExternalTunnel: "saveExternalTunnel",
@@ -2058,6 +2062,121 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
             setTokenVal("");
             setHostnameVal("");
             onSave({ token: "", hostname: "" });
+          }
+        }, "\u6E05\u9664"),
+        msg && React.createElement("span", {
+          style: { fontSize: 12, color: msg.ok ? "var(--dsw-alias-state-success-primary, #059669)" : "var(--dsw-alias-state-error-primary, #dc2626)" }
+        }, msg.text)
+      )
+    )
+  );
+});
+var MefrpConfigForm = React.memo(function MefrpConfigForm2({ accessToken: initToken, nodeId: initNode, remotePort: initPort, onSave }) {
+  const [open, setOpen] = React.useState(Boolean(initToken || initNode || initPort));
+  const [tokenVal, setTokenVal] = React.useState(initToken || "");
+  const [nodeVal, setNodeVal] = React.useState(initNode ? String(initNode) : "");
+  const [portVal, setPortVal] = React.useState(initPort ? String(initPort) : "");
+  const [saving, setSaving] = React.useState(false);
+  const [msg, setMsg] = React.useState(null);
+  React.useEffect(() => {
+    setTokenVal(initToken || "");
+    setNodeVal(initNode ? String(initNode) : "");
+    setPortVal(initPort ? String(initPort) : "");
+  }, [initToken, initNode, initPort]);
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMsg(null);
+    try {
+      const patch = {};
+      if (String(initNode || "") !== nodeVal.trim()) patch.nodeId = nodeVal.trim() ? Number(nodeVal.trim()) : 0;
+      if (String(initPort || "") !== portVal.trim()) patch.remotePort = portVal.trim() ? Number(portVal.trim()) : 0;
+      if (tokenVal !== (initToken || "")) patch.accessToken = tokenVal;
+      if (Object.keys(patch).length > 0) await onSave(patch);
+      setMsg({ ok: true, text: "\u2713 mefrp \u914D\u7F6E\u5DF2\u4FDD\u5B58" });
+    } catch (err) {
+      setMsg({ ok: false, text: err.message || "\u4FDD\u5B58\u5931\u8D25" });
+    } finally {
+      setSaving(false);
+    }
+  };
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...s.block,
+        borderTop: "1px solid var(--dsw-alias-border-secondary, #e5e7eb)",
+        paddingTop: 10,
+        marginTop: 10
+      }
+    },
+    React.createElement(
+      "div",
+      {
+        style: { display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", userSelect: "none" },
+        onClick: () => setOpen((v) => !v)
+      },
+      React.createElement(
+        "div",
+        { style: { fontSize: 12, fontWeight: 500, color: "var(--dsw-alias-brand-primary, #3b82f6)" } },
+        "\u2699\uFE0F \u9AD8\u7EA7\u914D\u7F6E\uFF1A\u56FA\u5B9A\u8282\u70B9 / \u7AEF\u53E3 ",
+        (initToken || initNode || initPort) && React.createElement("span", { style: { fontSize: 11, color: "var(--dsw-alias-state-success-primary, #059669)", fontWeight: 400 } }, "\u25CF \u5DF2\u914D\u7F6E")
+      ),
+      React.createElement("span", { style: { fontSize: 11, color: "var(--dsw-alias-label-secondary, #9ca3af)" } }, open ? "\u25B4 \u6298\u53E0" : "\u25BE \u5C55\u5F00")
+    ),
+    open && React.createElement(
+      "form",
+      { onSubmit: handleSave, style: { marginTop: 10 } },
+      React.createElement(
+        "div",
+        { style: { fontSize: 12, color: "var(--dsw-alias-label-secondary, #6b7280)", marginBottom: 8, lineHeight: 1.5 } },
+        "\u9ED8\u8BA4\u7559\u7A7A\u5373\u53EF\uFF1A\u7CFB\u7EDF\u81EA\u52A8\u9009\u62E9\u300C\u5728\u7EBF + \u975E VIP + \u8D1F\u8F7D\u6700\u4F4E\u300D\u7684\u8282\u70B9\u5E76\u968F\u673A\u5206\u914D\u7AEF\u53E3\u3002\u586B\u5199\u8282\u70B9 ID / \u8FDC\u7AEF\u7AEF\u53E3\u53EF\u56FA\u5B9A\u516C\u7F51\u5730\u5740\uFF08\u91CD\u542F\u540E\u4FDD\u6301\u4E0D\u53D8\uFF09\u3002\u4EC5\u300C\u8BBF\u95EE\u4EE4\u724C\u300D\u4E3A\u5FC5\u586B\u9879\uFF0C\u5728 mefrp \u63A7\u5236\u53F0\u300C\u7528\u6237\u8BBE\u7F6E \u2192 API Token\u300D\u83B7\u53D6\u3002"
+      ),
+      React.createElement(
+        "div",
+        { style: { marginBottom: 8 } },
+        React.createElement("input", {
+          style: s.input,
+          type: "password",
+          placeholder: "mefrp \u8BBF\u95EE\u4EE4\u724C (API Token)",
+          value: tokenVal,
+          onChange: (e) => setTokenVal(e.target.value)
+        })
+      ),
+      React.createElement(
+        "div",
+        { style: { display: "flex", gap: 8, marginBottom: 8 } },
+        React.createElement("input", {
+          style: { ...s.input, flex: 1 },
+          type: "number",
+          placeholder: "\u8282\u70B9 ID\uFF08\u53EF\u9009\uFF0C\u7559\u7A7A\u81EA\u52A8\u9009\uFF09",
+          value: nodeVal,
+          onChange: (e) => setNodeVal(e.target.value)
+        }),
+        React.createElement("input", {
+          style: { ...s.input, flex: 1 },
+          type: "number",
+          placeholder: "\u8FDC\u7AEF\u7AEF\u53E3\uFF08\u53EF\u9009\uFF0C\u7559\u7A7A\u968F\u673A\uFF09",
+          value: portVal,
+          onChange: (e) => setPortVal(e.target.value)
+        })
+      ),
+      React.createElement(
+        "div",
+        { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
+        React.createElement("button", {
+          type: "submit",
+          style: { ...s.btnPri, height: 28, fontSize: 12, padding: "0 12px" },
+          disabled: saving
+        }, saving ? "\u4FDD\u5B58\u4E2D\u2026" : "\u4FDD\u5B58 mefrp \u914D\u7F6E"),
+        (tokenVal || nodeVal || portVal) && React.createElement("button", {
+          type: "button",
+          style: { ...s.btnGhost, height: 28, fontSize: 12, padding: "0 10px" },
+          onClick: () => {
+            setTokenVal("");
+            setNodeVal("");
+            setPortVal("");
+            onSave({ accessToken: "", nodeId: 0, remotePort: 0 });
           }
         }, "\u6E05\u9664"),
         msg && React.createElement("span", {
@@ -4687,6 +4806,20 @@ function BridgePanel({ rpcCall }) {
     ({ token, hostname }) => act(BRIDGE_ENDPOINTS.saveCloudflaredConfig, { token, hostname }),
     [act]
   );
+  const onStartMefrp = React.useCallback(() => act(BRIDGE_ENDPOINTS.startMefrp), [act]);
+  const onStopMefrp = React.useCallback(() => act(BRIDGE_ENDPOINTS.stopMefrp), [act]);
+  const onResetMefrp = React.useCallback(
+    () => act(BRIDGE_ENDPOINTS.stopMefrp).then(() => act(BRIDGE_ENDPOINTS.startMefrp)),
+    [act]
+  );
+  const onToggleMefrpAutoStart = React.useCallback(
+    (autoStart) => act(BRIDGE_ENDPOINTS.setTunnelAutoStart, { tunnel: "mefrp", autoStart }),
+    [act]
+  );
+  const saveMefrpConfig = React.useCallback(
+    ({ accessToken, nodeId, remotePort }) => act(BRIDGE_ENDPOINTS.saveMefrpConfig, { accessToken, nodeId, remotePort }),
+    [act]
+  );
   const onSelectLanIp = React.useCallback((ip) => act(BRIDGE_ENDPOINTS.setLanIp, { ip }), [act]);
   const onStartCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.startCustomTunnel), [act]);
   const onStopCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.stopCustomTunnel), [act]);
@@ -4714,7 +4847,7 @@ function BridgePanel({ rpcCall }) {
   );
   const dots = {
     lan: !!status?.proxy?.running,
-    tunnel: !!(status?.cloudflared?.running || ct?.running),
+    tunnel: !!(status?.cloudflared?.running || ct?.running || status?.mefrp?.running),
     im: !!imConnected,
     security: !!status?.auth?.enabled
   };
@@ -4737,6 +4870,7 @@ function BridgePanel({ rpcCall }) {
   } else if (activeTab === "tunnel") {
     const ext = status?.externalTunnel;
     const cf = status?.cloudflared;
+    const mf = status?.mefrp;
     const cfDesc = cf?.tokenConfigured ? "\u56FA\u5B9A\u57DF\u540D\u6A21\u5F0F" : "\u514D\u767B\u5F55\u4E34\u65F6\u57DF\u540D";
     const entries = [
       ct && ct.running && {
@@ -4767,6 +4901,21 @@ function BridgePanel({ rpcCall }) {
         onStart: onStartCloudflared,
         onStop: onStopCloudflared,
         onReset: onResetCloudflared
+      },
+      mf && mf.running && {
+        key: "mefrp",
+        title: "mefrp \u96A7\u9053",
+        desc: "\u5E7B\u7F18\u6620\u5C04 \xB7 \u56FD\u5185\u516C\u7F51\u8282\u70B9",
+        url: mf.url || null,
+        qr: mf.qr,
+        running: true,
+        phase: mf.state && mf.state.phase,
+        stateDetail: mf.state && mf.state.detail,
+        autoStart: mf.autoStart,
+        onToggleAutoStart: onToggleMefrpAutoStart,
+        onStart: onStartMefrp,
+        onStop: onStopMefrp,
+        onReset: onResetMefrp
       },
       ext && ext.configured && ext.url && {
         key: "external",
@@ -4821,6 +4970,32 @@ function BridgePanel({ rpcCall }) {
             token: cf && cf.token || "",
             hostname: cf && cf.hostname || "",
             onSave: saveCloudflaredConfig
+          })
+        ),
+        React.createElement(
+          TunnelCard,
+          {
+            title: "mefrp \u96A7\u9053",
+            desc: "\u5E7B\u7F18\u6620\u5C04\uFF08mefrp.com\uFF09\xB7 \u56FD\u5185\u516C\u7F51\u8282\u70B9 \xB7 \u514D\u5907\u6848",
+            data: {
+              running: mf && mf.running,
+              url: mf && mf.url,
+              qr: mf && mf.qr,
+              state: mf && mf.state
+            },
+            autoStart: mf && mf.autoStart,
+            onToggleAutoStart: onToggleMefrpAutoStart,
+            auth: status && status.auth,
+            onNavigateSecurity: navSecurity,
+            onStart: onStartMefrp,
+            onStop: onStopMefrp,
+            onReset: mf && mf.running ? onResetMefrp : null
+          },
+          React.createElement(MefrpConfigForm, {
+            accessToken: mf && mf.token || "",
+            nodeId: mf && mf.nodeId || 0,
+            remotePort: mf && mf.remotePort || 0,
+            onSave: saveMefrpConfig
           })
         ),
         React.createElement(

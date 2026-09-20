@@ -46,6 +46,7 @@ Thumbs.db
 # DSH Bridge specific
 .dsh-bridge/
 bin/cloudflared*
+bin/mefrpc*
 
 # Temporary files
 *.tmp

@@ -812,6 +812,112 @@ const CloudflareConfigForm = React.memo(function CloudflareConfigForm({ token, h
   );
 });
 
+// mefrp（幻缘映射）隧道配置表单：仅需「访问令牌」即可一键开启；节点与端口默认自动选择，
+// 高级配置可手动指定节点 ID / 远端端口以固定公网地址。
+const MefrpConfigForm = React.memo(function MefrpConfigForm({ accessToken: initToken, nodeId: initNode, remotePort: initPort, onSave }) {
+  const [open, setOpen] = React.useState(Boolean(initToken || initNode || initPort));
+  const [tokenVal, setTokenVal] = React.useState(initToken || '');
+  const [nodeVal, setNodeVal] = React.useState(initNode ? String(initNode) : '');
+  const [portVal, setPortVal] = React.useState(initPort ? String(initPort) : '');
+  const [saving, setSaving] = React.useState(false);
+  const [msg, setMsg] = React.useState(null);
+
+  React.useEffect(() => {
+    setTokenVal(initToken || '');
+    setNodeVal(initNode ? String(initNode) : '');
+    setPortVal(initPort ? String(initPort) : '');
+  }, [initToken, initNode, initPort]);
+
+  const handleSave = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMsg(null);
+    try {
+      // 只回传被修改的字段：掩码 '******' 与未变更的 token 都不上传，服务端保留现值
+      const patch = {};
+      if (String(initNode || '') !== nodeVal.trim()) patch.nodeId = nodeVal.trim() ? Number(nodeVal.trim()) : 0;
+      if (String(initPort || '') !== portVal.trim()) patch.remotePort = portVal.trim() ? Number(portVal.trim()) : 0;
+      if (tokenVal !== (initToken || '')) patch.accessToken = tokenVal;
+      if (Object.keys(patch).length > 0) await onSave(patch);
+      setMsg({ ok: true, text: '✓ mefrp 配置已保存' });
+    } catch (err) {
+      setMsg({ ok: false, text: err.message || '保存失败' });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return React.createElement('div', {
+    style: {
+      ...s.block,
+      borderTop: '1px solid var(--dsw-alias-border-secondary, #e5e7eb)',
+      paddingTop: 10,
+      marginTop: 10,
+    },
+  },
+    React.createElement('div', {
+      style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer', userSelect: 'none' },
+      onClick: () => setOpen(v => !v),
+    },
+      React.createElement('div', { style: { fontSize: 12, fontWeight: 500, color: 'var(--dsw-alias-brand-primary, #3b82f6)' } },
+        '⚙️ 高级配置：固定节点 / 端口 ',
+        (initToken || initNode || initPort) && React.createElement('span', { style: { fontSize: 11, color: 'var(--dsw-alias-state-success-primary, #059669)', fontWeight: 400 } }, '● 已配置')
+      ),
+      React.createElement('span', { style: { fontSize: 11, color: 'var(--dsw-alias-label-secondary, #9ca3af)' } }, open ? '▴ 折叠' : '▾ 展开'),
+    ),
+    open && React.createElement('form', { onSubmit: handleSave, style: { marginTop: 10 } },
+      React.createElement('div', { style: { fontSize: 12, color: 'var(--dsw-alias-label-secondary, #6b7280)', marginBottom: 8, lineHeight: 1.5 } },
+        '默认留空即可：系统自动选择「在线 + 非 VIP + 负载最低」的节点并随机分配端口。填写节点 ID / 远端端口可固定公网地址（重启后保持不变）。仅「访问令牌」为必填项，在 mefrp 控制台「用户设置 → API Token」获取。'
+      ),
+      React.createElement('div', { style: { marginBottom: 8 } },
+        React.createElement('input', {
+          style: s.input,
+          type: 'password',
+          placeholder: 'mefrp 访问令牌 (API Token)',
+          value: tokenVal,
+          onChange: (e) => setTokenVal(e.target.value),
+        }),
+      ),
+      React.createElement('div', { style: { display: 'flex', gap: 8, marginBottom: 8 } },
+        React.createElement('input', {
+          style: { ...s.input, flex: 1 },
+          type: 'number',
+          placeholder: '节点 ID（可选，留空自动选）',
+          value: nodeVal,
+          onChange: (e) => setNodeVal(e.target.value),
+        }),
+        React.createElement('input', {
+          style: { ...s.input, flex: 1 },
+          type: 'number',
+          placeholder: '远端端口（可选，留空随机）',
+          value: portVal,
+          onChange: (e) => setPortVal(e.target.value),
+        }),
+      ),
+      React.createElement('div', { style: { display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' } },
+        React.createElement('button', {
+          type: 'submit',
+          style: { ...s.btnPri, height: 28, fontSize: 12, padding: '0 12px' },
+          disabled: saving,
+        }, saving ? '保存中…' : '保存 mefrp 配置'),
+        (tokenVal || nodeVal || portVal) && React.createElement('button', {
+          type: 'button',
+          style: { ...s.btnGhost, height: 28, fontSize: 12, padding: '0 10px' },
+          onClick: () => {
+            setTokenVal('');
+            setNodeVal('');
+            setPortVal('');
+            onSave({ accessToken: '', nodeId: 0, remotePort: 0 });
+          },
+        }, '清除'),
+        msg && React.createElement('span', {
+          style: { fontSize: 12, color: msg.ok ? 'var(--dsw-alias-state-success-primary, #059669)' : 'var(--dsw-alias-state-error-primary, #dc2626)' },
+        }, msg.text),
+      ),
+    ),
+  );
+});
+
 // 外部已部署隧道登记卡片：用户自行部署（Docker cloudflared / 其他反向代理）时，
 // 插件不下载不管理，仅登记公网地址用于面板展示二维码/URL 与放行 CORS。
 const ExternalTunnelCard = React.memo(function ExternalTunnelCard({ ext, onSave }) {
@@ -3230,6 +3336,18 @@ function BridgePanel({ rpcCall }) {
     act(BRIDGE_ENDPOINTS.saveCloudflaredConfig, { token, hostname })
   , [act]);
 
+  const onStartMefrp = React.useCallback(() => act(BRIDGE_ENDPOINTS.startMefrp), [act]);
+  const onStopMefrp  = React.useCallback(() => act(BRIDGE_ENDPOINTS.stopMefrp), [act]);
+  const onResetMefrp = React.useCallback(() =>
+    act(BRIDGE_ENDPOINTS.stopMefrp).then(() => act(BRIDGE_ENDPOINTS.startMefrp))
+  , [act]);
+  const onToggleMefrpAutoStart = React.useCallback((autoStart) =>
+    act(BRIDGE_ENDPOINTS.setTunnelAutoStart, { tunnel: 'mefrp', autoStart })
+  , [act]);
+  const saveMefrpConfig = React.useCallback(({ accessToken, nodeId, remotePort }) =>
+    act(BRIDGE_ENDPOINTS.saveMefrpConfig, { accessToken, nodeId, remotePort })
+  , [act]);
+
   const onSelectLanIp = React.useCallback((ip) => act(BRIDGE_ENDPOINTS.setLanIp, { ip }), [act]);
 
   const onStartCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.startCustomTunnel), [act]);
@@ -3261,7 +3379,7 @@ function BridgePanel({ rpcCall }) {
   );
   const dots = {
     lan:      !!(status?.proxy?.running),
-    tunnel:   !!(status?.cloudflared?.running || ct?.running),
+    tunnel:   !!(status?.cloudflared?.running || ct?.running || status?.mefrp?.running),
     im:       !!imConnected,
     security: !!(status?.auth?.enabled),
   };
@@ -3284,6 +3402,7 @@ function BridgePanel({ rpcCall }) {
   } else if (activeTab === 'tunnel') {
     const ext = status?.externalTunnel;
     const cf = status?.cloudflared;
+    const mf = status?.mefrp;
 
     // 计算"当前主入口"：优先自建隧道（固定地址）> Cloudflare > 外部登记。
     // running（含重连中）即入列——重连时 url 可能暂时为空，但应让用户看到状态。
@@ -3303,6 +3422,14 @@ function BridgePanel({ rpcCall }) {
         autoStart: cf.autoStart, onToggleAutoStart: onToggleCloudflaredAutoStart,
         onStart: onStartCloudflared, onStop: onStopCloudflared,
         onReset: onResetCloudflared,
+      },
+      mf && mf.running && {
+        key: 'mefrp', title: 'mefrp 隧道', desc: '幻缘映射 · 国内公网节点',
+        url: mf.url || null, qr: mf.qr, running: true,
+        phase: mf.state && mf.state.phase, stateDetail: mf.state && mf.state.detail,
+        autoStart: mf.autoStart, onToggleAutoStart: onToggleMefrpAutoStart,
+        onStart: onStartMefrp, onStop: onStopMefrp,
+        onReset: onResetMefrp,
       },
       ext && ext.configured && ext.url && {
         key: 'external', title: '外部已部署隧道', desc: '自行部署登记',
@@ -3351,6 +3478,30 @@ function BridgePanel({ rpcCall }) {
             token: (cf && cf.token) || '',
             hostname: (cf && cf.hostname) || '',
             onSave: saveCloudflaredConfig,
+          }),
+        ),
+        React.createElement(TunnelCard, {
+          title: 'mefrp 隧道',
+          desc: '幻缘映射（mefrp.com）· 国内公网节点 · 免备案',
+          data: {
+            running: mf && mf.running,
+            url: mf && mf.url,
+            qr: mf && mf.qr,
+            state: mf && mf.state,
+          },
+          autoStart: mf && mf.autoStart,
+          onToggleAutoStart: onToggleMefrpAutoStart,
+          auth: status && status.auth,
+          onNavigateSecurity: navSecurity,
+          onStart: onStartMefrp,
+          onStop:  onStopMefrp,
+          onReset: (mf && mf.running) ? onResetMefrp : null,
+        },
+          React.createElement(MefrpConfigForm, {
+            accessToken: (mf && mf.token) || '',
+            nodeId: (mf && mf.nodeId) || 0,
+            remotePort: (mf && mf.remotePort) || 0,
+            onSave: saveMefrpConfig,
           }),
         ),
         React.createElement(TunnelCard, {
