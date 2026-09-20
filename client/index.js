@@ -97,12 +97,21 @@ const ISSUES_URL = 'https://github.com/lejlm233/dsh-bridge/issues/new';
 const TUNNEL_DOCS_URL = 'https://github.com/lejlm233/dsh-bridge/blob/main/docs/custom-tunnel.md';
 const CLOUDFLARE_TUTORIAL_URL = 'https://github.com/lejlm233/dsh-bridge/blob/main/docs/cloudflare-fixed-domain.md';
 
+// 升级来源常量：与 lib/upgrade-source.mjs 保持一致（前端这里只用来拼展示/复制的命令文本，
+// 真正的 spec 由服务端构造，客户端传过去的只有版本号和 source 这两个受限字段）
+const NPM_PACKAGE = '@lejlm233/dsh-bridge';
+const GITHUB_REPO = 'lejlm233/dsh-bridge';
+
 // 生成升级命令（拼接具体版本号；用 add 而非 update，update --latest 受已安装依赖版本约束可能无法升级到最新版）
-function upgradeCommands(latest) {
-  const spec = `@lejlm233/dsh-bridge@${latest}`;
+// source==='github' 时把 git 写法排前面 —— 本仓库是 fork、未发布到 npm，npm 那条只会 404。
+function upgradeCommands(latest, source) {
+  const npmSpec = `${NPM_PACKAGE}@${latest}`;
+  const gitSpec = `github:${GITHUB_REPO}#v${latest}`;
+  const [primary, fallback] = source === 'github' ? [gitSpec, npmSpec] : [npmSpec, gitSpec];
   return [
-    { id: 'dsh',    cmd: `dsh plugin --profile web add ${spec}` },
-    { id: 'npx',    cmd: `npx --yes @deepseek-ai/dsh plugin --profile web add ${spec}` },
+    { id: 'dsh',     cmd: `dsh plugin --profile web add ${primary}` },
+    { id: 'npx',     cmd: `npx --yes @deepseek-ai/dsh plugin --profile web add ${primary}` },
+    { id: 'dsh-alt', cmd: `dsh plugin --profile web add ${fallback}` },
   ];
 }
 
@@ -2885,7 +2894,8 @@ function VersionBanner({ rpcCall }) {
     setDismissRestart(false);
     resetRestartStatus();
     try {
-      const r = await rpcCall(BRIDGE_ENDPOINTS.upgradePlugin, { version: info.latest });
+      // source 一并回传：服务端据此决定先试 npm 还是 git spec（另一条留作兜底）
+      const r = await rpcCall(BRIDGE_ENDPOINTS.upgradePlugin, { version: info.latest, source: info.source });
       if (r?.ok && r.value?.ok) {
         setUpgradeResult({ ok: true, message: `已成功升级到 v${info.latest}！` });
       } else {
@@ -3047,7 +3057,7 @@ function VersionBanner({ rpcCall }) {
                 fontWeight: 600,
                 color: 'var(--dsw-alias-state-info-primary,#1e40af)',
               },
-            }, `发现新版本 v${info.latest}（当前 v${info.current}）`),
+            }, `发现新版本 v${info.latest}（当前 v${info.current}）${info.source === 'github' ? ' · 来自 GitHub' : ''}`),
             React.createElement('button', {
               style: {
                 ...s.btnPri,
@@ -3175,7 +3185,7 @@ function VersionBanner({ rpcCall }) {
           showManual && React.createElement('div', {
             style: { display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 },
           },
-            upgradeCommands(info.latest).map(({ id, cmd }) =>
+            upgradeCommands(info.latest, info.source).map(({ id, cmd }) =>
               React.createElement(UpgradeCommandRow, { key: id, cmd })
             ),
           ),

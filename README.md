@@ -97,24 +97,33 @@ dsh --version
 ### 安装插件
 
 ```bash
-# 方式一：从 npm 安装最新版（推荐）
-dsh plugin --profile web add @lejlm233/dsh-bridge
+# 方式一：从 GitHub 直装（推荐；本仓库的构建产物已入库，装完即可用，无需自己构建）
+dsh plugin --profile web add github:lejlm233/dsh-bridge
 
 # 方式二：免全局权限的 npx 方式
-npx --yes @deepseek-ai/dsh plugin --profile web add @lejlm233/dsh-bridge
+npx --yes @deepseek-ai/dsh plugin --profile web add github:lejlm233/dsh-bridge
 
 # 方式三：从源码安装
 git clone https://github.com/lejlm233/dsh-bridge.git
 dsh plugin --profile web add ./dsh-bridge
+
+# 方式四：从 npm 安装（本仓库尚未发布到 npm，发布后可用）
+dsh plugin --profile web add @lejlm233/dsh-bridge
 ```
 
 ### 升级至最新版
 
 ```bash
 # 方式一：在设置页「远程访问」底部点击「🚀 一键升级到最新版并重启」（推荐，全自动）
+#   面板会先查 npm，查不到就自动改用 GitHub Release / tag，并按命中的来源安装。
+#   本仓库未发布到 npm，所以走的是 GitHub 来源。
 
-# 方式二：终端强制覆盖安装最新版
-dsh plugin --profile web add @lejlm233/dsh-bridge@latest
+# 方式二：终端强制覆盖安装最新版（默认分支即最新）
+dsh plugin --profile web add github:lejlm233/dsh-bridge
+
+# 也可以锁定到具体版本（tag 约定 v<version>）
+# dsh plugin --profile web add github:lejlm233/dsh-bridge#v2.10.12
+# npm 发布后亦可：dsh plugin --profile web add @lejlm233/dsh-bridge@latest
 ```
 
 > 💡 **提示（pnpm 11 用户）**：如果升级后仍显示旧版，是由于 pnpm 11 的 `minimumReleaseAge` 机制限制。在 Web 控制台点击「一键升级」即可自动跳过限制安装最新版。

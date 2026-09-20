@@ -95,24 +95,33 @@ This plugin supports **both old and new DSH releases** — there is no need to p
 ### Installation
 
 ```bash
-# Method 1: Install from npm (Recommended)
-dsh plugin --profile web add @lejlm233/dsh-bridge
+# Method 1: Install straight from GitHub (Recommended; build artifacts are committed, so it works as-is)
+dsh plugin --profile web add github:lejlm233/dsh-bridge
 
 # Method 2: Global-permission-free npx installation
-npx --yes @deepseek-ai/dsh plugin --profile web add @lejlm233/dsh-bridge
+npx --yes @deepseek-ai/dsh plugin --profile web add github:lejlm233/dsh-bridge
 
 # Method 3: Install from source
 git clone https://github.com/lejlm233/dsh-bridge.git
 dsh plugin --profile web add ./dsh-bridge
+
+# Method 4: Install from npm (this fork is not published to npm yet)
+dsh plugin --profile web add @lejlm233/dsh-bridge
 ```
 
 ### Upgrade
 
 ```bash
 # Recommended: Click "🚀 1-Click Upgrade & Restart" in Web Settings > Remote Access
+#   The panel checks npm first and automatically falls back to GitHub Release / tag,
+#   installing from whichever source it finds. This fork is not on npm, so it uses GitHub.
 
-# Or force install latest version via CLI:
-dsh plugin --profile web add @lejlm233/dsh-bridge@latest
+# Or force install latest version via CLI (default branch is always latest):
+dsh plugin --profile web add github:lejlm233/dsh-bridge
+
+# Pin a specific version (tag convention: v<version>)
+# dsh plugin --profile web add github:lejlm233/dsh-bridge#v2.10.12
+# Once published to npm: dsh plugin --profile web add @lejlm233/dsh-bridge@latest
 ```
 
 ---

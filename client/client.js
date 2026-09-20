@@ -1310,11 +1310,16 @@ var RELEASES_URL = "https://github.com/lejlm233/dsh-bridge/releases";
 var ISSUES_URL = "https://github.com/lejlm233/dsh-bridge/issues/new";
 var TUNNEL_DOCS_URL = "https://github.com/lejlm233/dsh-bridge/blob/main/docs/custom-tunnel.md";
 var CLOUDFLARE_TUTORIAL_URL = "https://github.com/lejlm233/dsh-bridge/blob/main/docs/cloudflare-fixed-domain.md";
-function upgradeCommands(latest) {
-  const spec = `@lejlm233/dsh-bridge@${latest}`;
+var NPM_PACKAGE = "@lejlm233/dsh-bridge";
+var GITHUB_REPO = "lejlm233/dsh-bridge";
+function upgradeCommands(latest, source) {
+  const npmSpec = `${NPM_PACKAGE}@${latest}`;
+  const gitSpec = `github:${GITHUB_REPO}#v${latest}`;
+  const [primary, fallback] = source === "github" ? [gitSpec, npmSpec] : [npmSpec, gitSpec];
   return [
-    { id: "dsh", cmd: `dsh plugin --profile web add ${spec}` },
-    { id: "npx", cmd: `npx --yes @deepseek-ai/dsh plugin --profile web add ${spec}` }
+    { id: "dsh", cmd: `dsh plugin --profile web add ${primary}` },
+    { id: "npx", cmd: `npx --yes @deepseek-ai/dsh plugin --profile web add ${primary}` },
+    { id: "dsh-alt", cmd: `dsh plugin --profile web add ${fallback}` }
   ];
 }
 var name = "dsh-bridge";
@@ -4453,7 +4458,7 @@ function VersionBanner({ rpcCall }) {
     setDismissRestart(false);
     resetRestartStatus();
     try {
-      const r = await rpcCall(BRIDGE_ENDPOINTS.upgradePlugin, { version: info.latest });
+      const r = await rpcCall(BRIDGE_ENDPOINTS.upgradePlugin, { version: info.latest, source: info.source });
       if (r?.ok && r.value?.ok) {
         setUpgradeResult({ ok: true, message: `\u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${info.latest}\uFF01` });
       } else {
@@ -4625,7 +4630,7 @@ function VersionBanner({ rpcCall }) {
                 fontWeight: 600,
                 color: "var(--dsw-alias-state-info-primary,#1e40af)"
               }
-            }, `\u53D1\u73B0\u65B0\u7248\u672C v${info.latest}\uFF08\u5F53\u524D v${info.current}\uFF09`),
+            }, `\u53D1\u73B0\u65B0\u7248\u672C v${info.latest}\uFF08\u5F53\u524D v${info.current}\uFF09${info.source === "github" ? " \xB7 \u6765\u81EA GitHub" : ""}`),
             React.createElement(
               "button",
               {
@@ -4756,7 +4761,7 @@ function VersionBanner({ rpcCall }) {
             {
               style: { display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }
             },
-            upgradeCommands(info.latest).map(
+            upgradeCommands(info.latest, info.source).map(
               ({ id, cmd }) => React.createElement(UpgradeCommandRow, { key: id, cmd })
             )
           )

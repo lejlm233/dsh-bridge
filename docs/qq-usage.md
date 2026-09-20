@@ -37,10 +37,10 @@ QQ Bot 使用 WebSocket 接收事件，需要配置 Intents（事件订阅）：
 ### 1. 启动 dsh-bridge
 
 ```bash
-# 安装最新版本
-npm install -g @lejlm233/dsh-bridge@latest
+# 安装插件（本仓库未发布到 npm，从 GitHub 直装）
+dsh plugin --profile web add github:lejlm233/dsh-bridge
 
-# 启动服务
+# 启动 DSH
 dsh web
 ```
 
