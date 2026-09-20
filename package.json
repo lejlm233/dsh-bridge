@@ -1,8 +1,8 @@
 {
   "name": "@lejlm233/dsh-bridge",
-  "version": "2.10.12",
-  "description": "手机扫码即可在移动端/公网继续用 DeepSeek Harness，人不在电脑前也能接着干。一键局域网二维码、Cloudflare 公网隧道、自建隧道与微信 / QQ / 飞书 / Telegram Bot（多工作区/会话持久化/媒体/卡片审批/流式输出），无需自己搭公网服务器。",
-  "releaseNotes": "【v2.10.12】（含 v2.10.11 的全部修复）\n• 修复：iOS 16 / 旧 Safari 打不开 DSH（红屏 Failed to load plugins）——补齐 Promise.withResolvers 与 Iterator 垫片，只在缺失时安装\n• 修复：鸿蒙手机上文档预览一直显示「文件资源服务不可用。」——新增 dsh-resource 地址的 URL 兼容层\n• 修复：移动端顶栏压住全屏面板顶部 52px（#41），并把移动端断点与宿主对齐（≤767px）\n• 修复：「重启 DSH」在 systemd 托管下点了没用、DSH 不再自动起来——改为交给 systemctl 重启并按退出码判定成败\n• 说明：systemd 环境需手动重启一次 dsh（systemctl --user restart dsh-web.service）让本版生效",
+  "version": "2.11.0",
+  "description": "手机扫码即可在移动端/公网继续用 DeepSeek Harness，人不在电脑前也能接着干。一键局域网二维码、Cloudflare 公网隧道、mefrp 自建隧道与微信 / QQ / 飞书 / Telegram Bot（多工作区/会话持久化/媒体/卡片审批/流式输出），无需自己搭公网服务器。",
+  "releaseNotes": "【v2.11.0】\n• 新增：mefrp 内网穿透后端——支持自建隧道（节点列表与手动选节点、隧道列表、删除、重置换址），全部可在设置页「远程访问」里管理\n• 新增：一键升级支持 GitHub 来源兜底——npm 上查不到包时自动改用 GitHub Release / tag，并按命中的来源执行安装\n• 变更：仓库地址与 npm 包名迁至本仓库（lejlm233/dsh-bridge），一键升级与安装文档同步指向\n• 修复：主题 token 缺失时输入框 / 按钮白底白字\n• 修复：删除隧道后界面没有任何反馈（跨组件作用域 bug）\n• 修复：移动端顶栏遮挡全屏面板顶部，移动端断点与宿主对齐",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

@@ -4,6 +4,30 @@
 
 ---
 
+## [v2.11.0] - 2026-09-20
+
+> 本版在 v2.10.12 基础上新增 mefrp 内网穿透与 GitHub 来源的一键升级兜底，并完成仓库/包名迁移到 `lejlm233/dsh-bridge`。
+
+### ✨ 新功能
+
+- **mefrp 内网穿透后端**：内置 mefrp（frp 0.67）客户端管理，支持自建隧道——节点列表与**手动选择节点**、隧道列表、删除隧道、重置换址，全部可在设置页「远程访问」里完成，无需再手改配置文件。桌面端同样可用。
+  - 节点列表会现场派生 VIP 标识（`allowGroup` 含 `vip` 而不含 `default`）。
+  - Android 环境下的 DNS 绕过：本机 CONNECT 代理强制 IPv4，避免华为机型 `net.dns1` 为空时回退 `8.8.8.8` 被墙导致 `api.mefrp.com` 解析超时。
+- **一键升级支持 GitHub 来源兜底**：面板查版本时先走 npm（npmmirror → npmjs），npm 上查不到包时自动改用 GitHub Release，无 Release 再退回 tags；升级按命中的来源执行，另一来源留作兜底。升级横幅会标注「来自 GitHub」。
+
+### 🔧 变更
+
+- **仓库地址与 npm 包名迁至本仓库**：`wenbin-wb/dsh-bridge` → `lejlm233/dsh-bridge`，npm 包名 `@wenbin_wb/dsh-bridge` → `@lejlm233/dsh-bridge`；一处改动覆盖 package.json / package-lock / cordis.patch.yml / 自更新源 / bundle loaderId 与全部文档。`LICENSE` 与 `README.en` 页脚保留上游署名。
+- **升级参数隔离**：安装 spec 的构造抽成纯函数 `lib/upgrade-source.mjs`，git 地址只由仓库常量拼出、版本号走严格正则白名单，且不接受客户端传入的任意 URL / spec——该字符串最终会进入 `shell: true` 的 spawn，必须锁死注入面。
+
+### 🐞 修复
+
+- **主题 token 缺失时输入框 / 按钮白底白字**：补上缺失的 CSS 变量回退。
+- **删除隧道后界面没有任何反馈**：原先误用另一组件的 `setTopMsg`（跨组件作用域，必然 ReferenceError），改为接口回传状态刷新 + 独立错误条。
+- **移动端顶栏遮挡全屏面板顶部**：新增移动端顶栏高度变量，并让移动端断点与宿主对齐。
+
+---
+
 ## [v2.10.12] - 2026-09-16
 
 > 本版汇总 v2.10.11 的修复内容，并含 4 处可靠性加固（systemctl 退出码判定、单元名解析、助手失败日志、注入分段判重）。

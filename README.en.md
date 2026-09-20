@@ -120,7 +120,7 @@ dsh plugin --profile web add @lejlm233/dsh-bridge
 dsh plugin --profile web add github:lejlm233/dsh-bridge
 
 # Pin a specific version (tag convention: v<version>)
-# dsh plugin --profile web add github:lejlm233/dsh-bridge#v2.10.12
+# dsh plugin --profile web add github:lejlm233/dsh-bridge#v2.11.0
 # Once published to npm: dsh plugin --profile web add @lejlm233/dsh-bridge@latest
 ```
 
