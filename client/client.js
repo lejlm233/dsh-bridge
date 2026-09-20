@@ -1081,6 +1081,7 @@ var BRIDGE_ENDPOINTS = {
   stopMefrp: "stopMefrp",
   resetMefrp: "resetMefrp",
   saveMefrpConfig: "saveMefrpConfig",
+  listMefrpNodes: "listMefrpNodes",
   setTunnelAutoStart: "setTunnelAutoStart",
   saveCustomTunnelConfig: "saveCustomTunnelConfig",
   saveExternalTunnel: "saveExternalTunnel",
@@ -2071,18 +2072,58 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
     )
   );
 });
-var MefrpConfigForm = React.memo(function MefrpConfigForm2({ accessToken: initToken, nodeId: initNode, remotePort: initPort, onSave }) {
+var MefrpConfigForm = React.memo(function MefrpConfigForm2({ accessToken: initToken, nodeId: initNode, remotePort: initPort, nodes, onLoadNodes, onSave }) {
   const [open, setOpen] = React.useState(Boolean(initToken || initNode || initPort));
   const [tokenVal, setTokenVal] = React.useState(initToken || "");
   const [nodeVal, setNodeVal] = React.useState(initNode ? String(initNode) : "");
   const [portVal, setPortVal] = React.useState(initPort ? String(initPort) : "");
   const [saving, setSaving] = React.useState(false);
   const [msg, setMsg] = React.useState(null);
+  const [nodeList, setNodeList] = React.useState(null);
+  const [loadingNodes, setLoadingNodes] = React.useState(false);
   React.useEffect(() => {
     setTokenVal(initToken || "");
     setNodeVal(initNode ? String(initNode) : "");
     setPortVal(initPort ? String(initPort) : "");
   }, [initToken, initNode, initPort]);
+  React.useEffect(() => {
+    if (Array.isArray(nodes)) setNodeList(nodes);
+  }, [nodes]);
+  const loadNodes = async () => {
+    setLoadingNodes(true);
+    setMsg(null);
+    try {
+      const list = await onLoadNodes(tokenVal);
+      setNodeList(Array.isArray(list) ? list : []);
+      if (!list || !list.length) setMsg({ ok: false, text: "\u672A\u53D6\u5230\u8282\u70B9\uFF0C\u8BF7\u68C0\u67E5\u4EE4\u724C\u6216\u7F51\u7EDC" });
+    } catch (e) {
+      setMsg({ ok: false, text: e.message || "\u52A0\u8F7D\u8282\u70B9\u5217\u8868\u5931\u8D25" });
+    } finally {
+      setLoadingNodes(false);
+    }
+  };
+  const rowStyle = (selected, offline) => ({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+    padding: "7px 10px",
+    fontSize: 12,
+    cursor: "pointer",
+    background: selected ? "var(--dsw-alias-interactive-bg-hover,#eef4ff)" : "transparent",
+    color: offline ? "var(--dsw-alias-label-tertiary,#9ca3af)" : "var(--dsw-alias-label-primary,#0f1115)",
+    borderBottom: "1px solid var(--dsw-alias-border-l2,#eef0f3)",
+    opacity: offline ? 0.6 : 1
+  });
+  const chipStyle = (kind) => ({
+    fontSize: 10,
+    lineHeight: 1.6,
+    padding: "1px 6px",
+    borderRadius: 999,
+    flexShrink: 0,
+    background: kind === "vip" ? "var(--dsw-alias-state-warn-secondary,#fde68a)" : "var(--dsw-alias-bg-layer-2,#f3f4f6)",
+    color: kind === "vip" ? "var(--dsw-alias-state-warn-primary,#92400e)" : "var(--dsw-alias-label-secondary,#4b5563)"
+  });
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -2142,6 +2183,79 @@ var MefrpConfigForm = React.memo(function MefrpConfigForm2({ accessToken: initTo
           value: tokenVal,
           onChange: (e) => setTokenVal(e.target.value)
         })
+      ),
+      // ── 节点选择：默认自动挑「在线 + 非 VIP + 负载最低」，也可手动指定 ──
+      React.createElement(
+        "div",
+        { style: { marginBottom: 8 } },
+        React.createElement(
+          "div",
+          {
+            style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 6 }
+          },
+          React.createElement(
+            "span",
+            { style: { fontSize: 12, color: "var(--dsw-alias-label-secondary,#4b5563)" } },
+            "\u8282\u70B9\uFF1A",
+            React.createElement(
+              "span",
+              { style: { color: "var(--dsw-alias-label-primary,#0f1115)", fontWeight: 500 } },
+              nodeVal ? "\u5DF2\u6307\u5B9A #" + nodeVal : "\u81EA\u52A8\u9009\u62E9"
+            )
+          ),
+          React.createElement("button", {
+            type: "button",
+            style: { ...s.btnGhost, height: 24, fontSize: 11, padding: "0 10px", flexShrink: 0 },
+            disabled: loadingNodes,
+            onClick: loadNodes
+          }, loadingNodes ? "\u52A0\u8F7D\u4E2D\u2026" : "\u{1F504} \u52A0\u8F7D\u8282\u70B9\u5217\u8868")
+        ),
+        nodeList && nodeList.length > 0 && React.createElement(
+          "div",
+          {
+            style: {
+              maxHeight: 190,
+              overflowY: "auto",
+              borderRadius: 8,
+              border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)",
+              background: "var(--dsw-alias-bg-layer-1,#fff)"
+            }
+          },
+          React.createElement(
+            "div",
+            {
+              key: "__auto",
+              onClick: () => setNodeVal(""),
+              style: rowStyle(!nodeVal, false)
+            },
+            React.createElement("span", null, "\u26A1 \u81EA\u52A8\u9009\u62E9\uFF08\u5728\u7EBF + \u975E VIP + \u8D1F\u8F7D\u6700\u4F4E\uFF09"),
+            !nodeVal && React.createElement("span", { style: chipStyle("ok") }, "\u2713 \u5F53\u524D")
+          ),
+          nodeList.map((n) => React.createElement(
+            "div",
+            {
+              key: n.nodeId,
+              onClick: () => setNodeVal(String(n.nodeId)),
+              style: rowStyle(String(n.nodeId) === nodeVal, !n.isOnline),
+              title: [n.hostname, n.allowPort ? "\u7AEF\u53E3\u6BB5: " + n.allowPort : ""].filter(Boolean).join("  ")
+            },
+            React.createElement(
+              "span",
+              { style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } },
+              n.name || "\u8282\u70B9 #" + n.nodeId,
+              n.region ? " \xB7 " + n.region : "",
+              n.bandwidth ? " \xB7 " + n.bandwidth : ""
+            ),
+            React.createElement(
+              "span",
+              { style: { display: "flex", alignItems: "center", gap: 6, flexShrink: 0 } },
+              n.loadPercent != null && React.createElement("span", { style: { color: "var(--dsw-alias-label-tertiary,#6b7280)" } }, n.loadPercent + "%"),
+              n.vip && React.createElement("span", { style: chipStyle("vip") }, "VIP"),
+              !n.isOnline && React.createElement("span", { style: chipStyle("off") }, "\u79BB\u7EBF"),
+              String(n.nodeId) === nodeVal && React.createElement("span", { style: chipStyle("ok") }, "\u2713")
+            )
+          ))
+        )
       ),
       React.createElement(
         "div",
@@ -4820,6 +4934,12 @@ function BridgePanel({ rpcCall }) {
     ({ accessToken, nodeId, remotePort }) => act(BRIDGE_ENDPOINTS.saveMefrpConfig, { accessToken, nodeId, remotePort }),
     [act]
   );
+  const loadMefrpNodes = React.useCallback(async (accessToken) => {
+    const r = await authRpcCall(BRIDGE_ENDPOINTS.listMefrpNodes, { accessToken });
+    if (!r?.ok) throw new Error(r?.error?.message ?? "\u52A0\u8F7D\u8282\u70B9\u5217\u8868\u5931\u8D25");
+    setStatus(r.value);
+    return r.value?.mefrpNodes ?? [];
+  }, [authRpcCall]);
   const onSelectLanIp = React.useCallback((ip) => act(BRIDGE_ENDPOINTS.setLanIp, { ip }), [act]);
   const onStartCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.startCustomTunnel), [act]);
   const onStopCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.stopCustomTunnel), [act]);
@@ -4995,6 +5115,8 @@ function BridgePanel({ rpcCall }) {
             accessToken: mf && mf.token || "",
             nodeId: mf && mf.nodeId || 0,
             remotePort: mf && mf.remotePort || 0,
+            nodes: status && status.mefrpNodes,
+            onLoadNodes: loadMefrpNodes,
             onSave: saveMefrpConfig
           })
         ),

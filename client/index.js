@@ -818,19 +818,60 @@ const CloudflareConfigForm = React.memo(function CloudflareConfigForm({ token, h
 
 // mefrp（幻缘映射）隧道配置表单：仅需「访问令牌」即可一键开启；节点与端口默认自动选择，
 // 高级配置可手动指定节点 ID / 远端端口以固定公网地址。
-const MefrpConfigForm = React.memo(function MefrpConfigForm({ accessToken: initToken, nodeId: initNode, remotePort: initPort, onSave }) {
+const MefrpConfigForm = React.memo(function MefrpConfigForm({ accessToken: initToken, nodeId: initNode, remotePort: initPort, nodes, onLoadNodes, onSave }) {
   const [open, setOpen] = React.useState(Boolean(initToken || initNode || initPort));
   const [tokenVal, setTokenVal] = React.useState(initToken || '');
   const [nodeVal, setNodeVal] = React.useState(initNode ? String(initNode) : '');
   const [portVal, setPortVal] = React.useState(initPort ? String(initPort) : '');
   const [saving, setSaving] = React.useState(false);
   const [msg, setMsg] = React.useState(null);
+  const [nodeList, setNodeList] = React.useState(null);
+  const [loadingNodes, setLoadingNodes] = React.useState(false);
 
   React.useEffect(() => {
     setTokenVal(initToken || '');
     setNodeVal(initNode ? String(initNode) : '');
     setPortVal(initPort ? String(initPort) : '');
   }, [initToken, initNode, initPort]);
+
+  // 节点列表由 RPC 返回值随 status 一起回传，这里跟随 status 更新
+  React.useEffect(() => {
+    if (Array.isArray(nodes)) setNodeList(nodes);
+  }, [nodes]);
+
+  const loadNodes = async () => {
+    setLoadingNodes(true);
+    setMsg(null);
+    try {
+      const list = await onLoadNodes(tokenVal);
+      setNodeList(Array.isArray(list) ? list : []);
+      if (!list || !list.length) setMsg({ ok: false, text: '未取到节点，请检查令牌或网络' });
+    } catch (e) {
+      setMsg({ ok: false, text: e.message || '加载节点列表失败' });
+    } finally {
+      setLoadingNodes(false);
+    }
+  };
+
+  // 节点行样式。兜底一律「浅底深字」，避免宿主无主题变量时出现白底白字。
+  const rowStyle = (selected, offline) => ({
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
+    padding: '7px 10px', fontSize: 12,
+    cursor: 'pointer',
+    background: selected ? 'var(--dsw-alias-interactive-bg-hover,#eef4ff)' : 'transparent',
+    color: offline ? 'var(--dsw-alias-label-tertiary,#9ca3af)' : 'var(--dsw-alias-label-primary,#0f1115)',
+    borderBottom: '1px solid var(--dsw-alias-border-l2,#eef0f3)',
+    opacity: offline ? 0.6 : 1,
+  });
+  const chipStyle = (kind) => ({
+    fontSize: 10, lineHeight: 1.6, padding: '1px 6px', borderRadius: 999, flexShrink: 0,
+    background: kind === 'vip'
+      ? 'var(--dsw-alias-state-warn-secondary,#fde68a)'
+      : 'var(--dsw-alias-bg-layer-2,#f3f4f6)',
+    color: kind === 'vip'
+      ? 'var(--dsw-alias-state-warn-primary,#92400e)'
+      : 'var(--dsw-alias-label-secondary,#4b5563)',
+  });
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -881,6 +922,58 @@ const MefrpConfigForm = React.memo(function MefrpConfigForm({ accessToken: initT
           value: tokenVal,
           onChange: (e) => setTokenVal(e.target.value),
         }),
+      ),
+      // ── 节点选择：默认自动挑「在线 + 非 VIP + 负载最低」，也可手动指定 ──
+      React.createElement('div', { style: { marginBottom: 8 } },
+        React.createElement('div', {
+          style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 6 },
+        },
+          React.createElement('span', { style: { fontSize: 12, color: 'var(--dsw-alias-label-secondary,#4b5563)' } },
+            '节点：',
+            React.createElement('span', { style: { color: 'var(--dsw-alias-label-primary,#0f1115)', fontWeight: 500 } },
+              nodeVal ? ('已指定 #' + nodeVal) : '自动选择'),
+          ),
+          React.createElement('button', {
+            type: 'button',
+            style: { ...s.btnGhost, height: 24, fontSize: 11, padding: '0 10px', flexShrink: 0 },
+            disabled: loadingNodes,
+            onClick: loadNodes,
+          }, loadingNodes ? '加载中…' : '🔄 加载节点列表'),
+        ),
+        nodeList && nodeList.length > 0 && React.createElement('div', {
+          style: {
+            maxHeight: 190, overflowY: 'auto', borderRadius: 8,
+            border: '1px solid var(--dsw-alias-border-l2,#e5e7eb)',
+            background: 'var(--dsw-alias-bg-layer-1,#fff)',
+          },
+        },
+          React.createElement('div', {
+            key: '__auto',
+            onClick: () => setNodeVal(''),
+            style: rowStyle(!nodeVal, false),
+          },
+            React.createElement('span', null, '⚡ 自动选择（在线 + 非 VIP + 负载最低）'),
+            !nodeVal && React.createElement('span', { style: chipStyle('ok') }, '✓ 当前'),
+          ),
+          nodeList.map((n) => React.createElement('div', {
+            key: n.nodeId,
+            onClick: () => setNodeVal(String(n.nodeId)),
+            style: rowStyle(String(n.nodeId) === nodeVal, !n.isOnline),
+            title: [n.hostname, n.allowPort ? ('端口段: ' + n.allowPort) : ''].filter(Boolean).join('  '),
+          },
+            React.createElement('span', { style: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } },
+              n.name || ('节点 #' + n.nodeId),
+              n.region ? (' · ' + n.region) : '',
+              n.bandwidth ? (' · ' + n.bandwidth) : '',
+            ),
+            React.createElement('span', { style: { display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 } },
+              n.loadPercent != null && React.createElement('span', { style: { color: 'var(--dsw-alias-label-tertiary,#6b7280)' } }, n.loadPercent + '%'),
+              n.vip && React.createElement('span', { style: chipStyle('vip') }, 'VIP'),
+              !n.isOnline && React.createElement('span', { style: chipStyle('off') }, '离线'),
+              String(n.nodeId) === nodeVal && React.createElement('span', { style: chipStyle('ok') }, '✓'),
+            ),
+          )),
+        ),
       ),
       React.createElement('div', { style: { display: 'flex', gap: 8, marginBottom: 8 } },
         React.createElement('input', {
@@ -3351,6 +3444,13 @@ function BridgePanel({ rpcCall }) {
   const saveMefrpConfig = React.useCallback(({ accessToken, nodeId, remotePort }) =>
     act(BRIDGE_ENDPOINTS.saveMefrpConfig, { accessToken, nodeId, remotePort })
   , [act]);
+  // 单独走 authRpcCall（而非 act）：需要把失败抛出给表单显示，act 会吞掉错误
+  const loadMefrpNodes = React.useCallback(async (accessToken) => {
+    const r = await authRpcCall(BRIDGE_ENDPOINTS.listMefrpNodes, { accessToken });
+    if (!r?.ok) throw new Error(r?.error?.message ?? '加载节点列表失败');
+    setStatus(r.value);
+    return r.value?.mefrpNodes ?? [];
+  }, [authRpcCall]);
 
   const onSelectLanIp = React.useCallback((ip) => act(BRIDGE_ENDPOINTS.setLanIp, { ip }), [act]);
 
@@ -3505,6 +3605,8 @@ function BridgePanel({ rpcCall }) {
             accessToken: (mf && mf.token) || '',
             nodeId: (mf && mf.nodeId) || 0,
             remotePort: (mf && mf.remotePort) || 0,
+            nodes: status && status.mefrpNodes,
+            onLoadNodes: loadMefrpNodes,
             onSave: saveMefrpConfig,
           }),
         ),
