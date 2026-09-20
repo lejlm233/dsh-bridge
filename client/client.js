@@ -1281,15 +1281,15 @@ function semverGt(a, b) {
 var s = {
   card: { background: "var(--dsw-alias-bg-layer-2,#f9fafb)", border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)", borderRadius: 12, padding: "16px 18px", marginBottom: 16, boxSizing: "border-box" },
   block: { borderTop: "1px solid var(--dsw-alias-border-l2,#e5e7eb)", marginTop: 12, paddingTop: 12 },
-  muted: { color: "var(--dsw-alias-label-tertiary,#8b93a1)", fontSize: 12, lineHeight: 1.5 },
-  label: { color: "var(--dsw-alias-label-primary,currentColor)", fontSize: 13, fontWeight: 500 },
-  code: { fontFamily: "ui-monospace,Menlo,monospace", fontSize: 12, wordBreak: "break-all", color: "var(--dsw-alias-label-primary,currentColor)" },
-  btnPri: { font: "inherit", cursor: "pointer", border: "none", background: "var(--dsw-alias-brand-primary,#4f6ef7)", color: "var(--dsw-alias-label-primary-foreground,#fff)", height: 32, padding: "0 14px", borderRadius: 999, fontSize: 13, fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 4 },
-  btnGhost: { font: "inherit", cursor: "pointer", border: "1px solid var(--dsw-alias-border-l2,#d1d5db)", background: "var(--dsw-alias-bg-layer-2,#f9fafb)", color: "var(--dsw-alias-label-primary,currentColor)", height: 32, padding: "0 14px", borderRadius: 999, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 4, textDecoration: "none" },
-  btnLink: { font: "inherit", cursor: "pointer", border: "none", background: "none", color: "var(--dsw-alias-brand-primary,#4f6ef7)", fontSize: 12, padding: 0, display: "inline-flex", alignItems: "center", gap: 3, textDecoration: "none" },
+  muted: { color: "var(--dsw-alias-label-tertiary,#6b7280)", fontSize: 12, lineHeight: 1.5 },
+  label: { color: "var(--dsw-alias-label-primary,#0f1115)", fontSize: 13, fontWeight: 500 },
+  code: { fontFamily: "ui-monospace,Menlo,monospace", fontSize: 12, wordBreak: "break-all", color: "var(--dsw-alias-label-primary,#0f1115)" },
+  btnPri: { font: "inherit", cursor: "pointer", border: "none", background: "var(--dsw-alias-button-primary-fill,var(--dsw-alias-brand-primary,#4f6ef7))", color: "var(--dsw-alias-label-primary-foreground,var(--dsw-alias-bg-base,#fff))", height: 32, padding: "0 14px", borderRadius: 999, fontSize: 13, fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 4 },
+  btnGhost: { font: "inherit", cursor: "pointer", border: "1px solid var(--dsw-alias-border-l2,#d1d5db)", background: "var(--dsw-alias-bg-layer-2,#f9fafb)", color: "var(--dsw-alias-label-primary,#0f1115)", height: 32, padding: "0 14px", borderRadius: 999, fontSize: 13, display: "inline-flex", alignItems: "center", gap: 4, textDecoration: "none" },
+  btnLink: { font: "inherit", cursor: "pointer", border: "none", background: "none", color: "var(--dsw-alias-link,#2563eb)", fontSize: 12, padding: 0, display: "inline-flex", alignItems: "center", gap: 3, textDecoration: "none" },
   qr: { width: 200, height: 200, maxWidth: "100%", borderRadius: 10, border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)", margin: "8px 0", display: "block", background: "#ffffff", padding: 6, boxSizing: "border-box" },
   tag: { display: "inline-flex", alignItems: "center", justifyContent: "center", padding: "3px 10px", borderRadius: 999, fontSize: 12, fontWeight: 500, whiteSpace: "nowrap", flexShrink: 0, minWidth: "max-content", lineHeight: 1.4 },
-  input: { width: "100%", font: "inherit", fontSize: 13, padding: "7px 10px", borderRadius: 8, border: "1px solid var(--dsw-alias-border-l2,#d1d5db)", background: "var(--dsw-alias-bg-layer-2,#f9fafb)", color: "var(--dsw-alias-label-primary,currentColor)", outline: "none", boxSizing: "border-box" },
+  input: { width: "100%", font: "inherit", fontSize: 13, padding: "7px 10px", borderRadius: 8, border: "1px solid var(--dsw-alias-border-l3,#d1d5db)", background: "var(--dsw-alias-bg-layer-1,#fff)", color: "var(--dsw-alias-label-primary,#0f1115)", caretColor: "var(--dsw-alias-label-primary,#0f1115)", WebkitTextFillColor: "var(--dsw-alias-label-primary,#0f1115)", outline: "none", boxSizing: "border-box" },
   warn: { background: "var(--dsw-alias-state-warn-bg,#fffbeb)", border: "1px solid var(--dsw-alias-state-warn-border,#fde68a)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "var(--dsw-alias-state-warn-primary,#92400e)", lineHeight: 1.6 },
   err: { background: "var(--dsw-alias-state-error-bg,#fef2f2)", border: "1px solid var(--dsw-alias-state-error-border,#fecaca)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "var(--dsw-alias-state-error-primary,#991b1b)", lineHeight: 1.6 },
   tip: { background: "var(--dsw-alias-bg-layer-2,#f9fafb)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "var(--dsw-alias-label-secondary,#6b7280)", lineHeight: 1.6 }
@@ -1563,7 +1563,7 @@ var LanNetworkSelector = React.memo(function LanNetworkSelector2({ lan, onSelect
           marginBottom: 6,
           fontSize: 12,
           fontWeight: 500,
-          color: "var(--dsw-alias-label-primary, currentColor)"
+          color: "var(--dsw-alias-label-primary, #0f1115)"
         }
       },
       React.createElement(
@@ -2596,7 +2596,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
                     transition: "all 0.15s ease"
                   }
                 },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,currentColor)" } }, opt.title),
+                React.createElement("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,#0f1115)" } }, opt.title),
                 React.createElement("div", { style: { ...s.muted, fontSize: 11, marginTop: 4 } }, opt.desc)
               );
             })
@@ -2631,7 +2631,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
                     transition: "all 0.15s ease"
                   }
                 },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,currentColor)" } }, opt.title),
+                React.createElement("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,#0f1115)" } }, opt.title),
                 React.createElement("div", { style: { ...s.muted, fontSize: 11, marginTop: 3 } }, opt.desc)
               );
             })
@@ -2743,7 +2743,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
             },
             React.createElement(
               "div",
-              { style: { fontSize: 12, fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)" } },
+              { style: { fontSize: 12, fontWeight: 600, color: "var(--dsw-alias-label-primary,#0f1115)" } },
               adminProtection ? "\u{1F6E1}\uFE0F \u7BA1\u7406\u4FDD\u62A4\u5DF2\u5F00\u542F\uFF08\u4FEE\u6539\u914D\u7F6E\u9700\u7BA1\u7406\u5BC6\u7801\uFF09" : "\u26A0\uFE0F \u7BA1\u7406\u4FDD\u62A4\u5DF2\u5173\u95ED\uFF08\u4FEE\u6539\u914D\u7F6E\u514D\u5BC6\uFF09"
             ),
             React.createElement("button", {
@@ -2836,7 +2836,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
                     transition: "all 0.15s ease"
                   }
                 },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,currentColor)" } }, opt.title),
+                React.createElement("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,#0f1115)" } }, opt.title),
                 React.createElement("div", { style: { ...s.muted, fontSize: 11, marginTop: 4 } }, opt.desc)
               );
             })
@@ -3180,7 +3180,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall }) {
         platform.allowFrom?.length ? platform.allowFrom.map(
           (id) => React.createElement(
             "span",
-            { key: id, style: { ...s.tag, background: "var(--dsw-alias-bg-layer-2,#f3f4f6)", color: "var(--dsw-alias-label-primary,currentColor)", gap: 6 } },
+            { key: id, style: { ...s.tag, background: "var(--dsw-alias-bg-layer-2,#f3f4f6)", color: "var(--dsw-alias-label-primary,#0f1115)", gap: 6 } },
             React.createElement("span", { style: { fontSize: 12, wordBreak: "break-all" } }, id),
             React.createElement("button", {
               style: { cursor: "pointer", border: "none", background: "none", color: "var(--dsw-alias-state-error-primary,#dc2626)", fontSize: 12, padding: 0 },
@@ -3602,7 +3602,7 @@ function SystemMetricsWidget({ metrics }) {
         React.createElement("div", { style: { color: "var(--dsw-alias-label-tertiary, #9ca3af)", fontSize: 11, marginBottom: 2 } }, "CPU \u6838\u5FC3\u4E0E\u578B\u53F7"),
         React.createElement(
           "div",
-          { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, currentColor)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }, title: metrics.cpu?.model },
+          { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, #0f1115)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }, title: metrics.cpu?.model },
           `${metrics.cpu?.cores || 0} \u6838\u5FC3 (${(metrics.cpu?.model || "").split("@")[0].trim()})`
         )
       ),
@@ -3622,7 +3622,7 @@ function SystemMetricsWidget({ metrics }) {
         React.createElement("div", { style: { color: "var(--dsw-alias-label-tertiary, #9ca3af)", fontSize: 11, marginBottom: 2 } }, "Node \u8FDB\u7A0B\u5806\u5185\u5B58"),
         React.createElement(
           "div",
-          { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, currentColor)" } },
+          { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, #0f1115)" } },
           `${heapMb} MB`
         )
       )
@@ -3766,7 +3766,7 @@ function NetworkDiagnosticWidget({ rpcCall }) {
             { style: { flex: 1, minWidth: 0 } },
             React.createElement(
               "div",
-              { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, currentColor)", marginBottom: 2 } },
+              { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, #0f1115)", marginBottom: 2 } },
               isPass ? "\u2713 " : isWarn ? "\u25B2 " : "\u2715 ",
               item.name
             ),
@@ -5168,7 +5168,7 @@ function BridgePanel({ rpcCall }) {
               margin: "14px auto 0"
             }
           },
-          React.createElement("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)", marginBottom: 4 } }, "\u{1F6DF} \u6551\u6025\u89E3\u9664\u9501\u5B9A\u6307\u5F15\uFF1A"),
+          React.createElement("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary,#0f1115)", marginBottom: 4 } }, "\u{1F6DF} \u6551\u6025\u89E3\u9664\u9501\u5B9A\u6307\u5F15\uFF1A"),
           React.createElement("div", null, "1. ", React.createElement("strong", null, "\u7535\u8111\u672C\u673A\u76F4\u8FDE\u4FEE\u6539"), "\uFF1A\u76F4\u63A5\u5728\u8FD0\u884C\u672C\u7A0B\u5E8F\u7684\u7535\u8111\u672C\u673A\u6253\u5F00\u672C\u63A7\u5236\u53F0\uFF08127.0.0.1 \u4EAB\u6709\u7269\u7406\u514D\u9501\u7279\u6743\uFF09\uFF0C\u53EF\u968F\u65F6\u4FEE\u6539\u7B56\u7565\u6216\u6E05\u9664\u5BC6\u7801\u3002"),
           React.createElement("div", { style: { marginTop: 4 } }, "2. ", React.createElement("strong", null, "\u670D\u52A1\u5668 / \u65E0\u5934\u73AF\u5883"), "\uFF1A\u6551\u6025\u91CD\u7F6E\u6B65\u9AA4\u53C2\u89C1 GitHub README \u7684\u300C\u4E09\u91CD\u5BB9\u707E\u4FDD\u547D\u4F53\u7CFB\u300D\u7AE0\u8282\u3002")
         )
@@ -5267,7 +5267,7 @@ function BridgePanel({ rpcCall }) {
               textAlign: "left"
             }
           },
-          React.createElement("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)", marginBottom: 4 } }, "\u{1F6DF} \u627E\u56DE\u4E0E\u91CD\u7F6E" + unlockPwdKind + "\u6307\u5F15\uFF1A"),
+          React.createElement("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary,#0f1115)", marginBottom: 4 } }, "\u{1F6DF} \u627E\u56DE\u4E0E\u91CD\u7F6E" + unlockPwdKind + "\u6307\u5F15\uFF1A"),
           React.createElement("div", null, "1. ", React.createElement("strong", null, "\u7535\u8111\u672C\u673A\u76F4\u8FDE\u4FEE\u6539"), "\uFF1A\u76F4\u63A5\u5728\u8FD0\u884C\u672C\u7A0B\u5E8F\u7684\u7535\u8111\u672C\u673A\u6253\u5F00\u672C\u63A7\u5236\u53F0\uFF08127.0.0.1 \u4EAB\u6709\u7269\u7406\u514D\u9501\u7279\u6743\uFF09\uFF0C\u53EF\u968F\u65F6\u4FEE\u6539\u6216\u6E05\u9664\u5BC6\u7801\u3002"),
           React.createElement("div", { style: { marginTop: 4 } }, "2. ", React.createElement("strong", null, "\u670D\u52A1\u5668 / \u65E0\u5934\u73AF\u5883"), "\uFF1A\u6551\u6025\u91CD\u7F6E\u6B65\u9AA4\u53C2\u89C1 GitHub README \u7684\u300C\u4E09\u91CD\u5BB9\u707E\u4FDD\u547D\u4F53\u7CFB\u300D\u7AE0\u8282\u3002")
         )
@@ -5399,7 +5399,7 @@ function BridgePanel({ rpcCall }) {
           { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 } },
           React.createElement(
             "div",
-            { style: { fontSize: 16, fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)", display: "flex", alignItems: "center", gap: 8 } },
+            { style: { fontSize: 16, fontWeight: 600, color: "var(--dsw-alias-label-primary,#0f1115)", display: "flex", alignItems: "center", gap: 8 } },
             "\u{1F512} \u89E3\u9501\u540E\u53F0\u7BA1\u7406\u6743\u9650"
           ),
           React.createElement("button", {
@@ -5797,7 +5797,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
           <div style="font-size: 11px; color: var(--dsw-alias-label-secondary, #6b7280); margin-bottom: 8px; line-height: 1.5;">\u8FDC\u7A0B\u8BBF\u95EE\u65F6\u6D4F\u89C8/\u6DFB\u52A0\u5DE5\u4F5C\u533A\u9700\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\uFF08\u4E0E\u8BBF\u95EE\u5BC6\u7801\u4E0D\u540C\uFF09\u3002</div>
           <form id="dsh-ws-unlock-form" style="display: flex; gap: 8px;">
             <input id="dsh-ws-unlock-input" type="password" placeholder="\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801" value="${escapeHtml(unlockInput)}"
-              style="flex: 1; font: inherit; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, currentColor); outline: none; box-sizing: border-box;" />
+              style="flex: 1; font: inherit; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #0f1115); caret-color: var(--dsw-alias-label-primary, #0f1115); -webkit-text-fill-color: var(--dsw-alias-label-primary, #0f1115); outline: none; box-sizing: border-box;" />
             <button type="submit" style="border: none; background: var(--dsw-static-blue-600, #4f6ef7); color: #fff; border-radius: 8px; padding: 0 14px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;" ${unlocking ? "disabled" : ""}>${unlocking ? "\u89E3\u9501\u4E2D\u2026" : "\u89E3\u9501"}</button>
           </form>
           ${unlockErr ? `<div style="font-size: 11px; color: var(--dsw-alias-state-error-primary, #dc2626); margin-top: 6px;">${escapeHtml(unlockErr)}</div>` : ""}

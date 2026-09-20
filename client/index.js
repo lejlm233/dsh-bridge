@@ -125,18 +125,22 @@ function semverGt(a, b) {
   return av.pre > bv.pre;
 }
 
+// 注意：兜底色必须「自洽」。宿主拿不到 --dsw-alias-* 主题变量时会整组回退，
+// 此时背景兜底是浅色系（bg-layer-2 -> #f9fafb），因此文字兜底必须是深色系。
+// 千万不要用 currentColor：宿主若是深色主题，继承来的就是白字 -> 白底白字，输入框看着像「打不进字」。
+// primary 按钮用官方语义 token：button-primary-fill（= brand-primary）配 label-primary-foreground。
 const s = {
   card:     { background: 'var(--dsw-alias-bg-layer-2,#f9fafb)', border: '1px solid var(--dsw-alias-border-l2,#e5e7eb)', borderRadius: 12, padding: '16px 18px', marginBottom: 16, boxSizing: 'border-box' },
   block:    { borderTop: '1px solid var(--dsw-alias-border-l2,#e5e7eb)', marginTop: 12, paddingTop: 12 },
-  muted:    { color: 'var(--dsw-alias-label-tertiary,#8b93a1)', fontSize: 12, lineHeight: 1.5 },
-  label:    { color: 'var(--dsw-alias-label-primary,currentColor)', fontSize: 13, fontWeight: 500 },
-  code:     { fontFamily: 'ui-monospace,Menlo,monospace', fontSize: 12, wordBreak: 'break-all', color: 'var(--dsw-alias-label-primary,currentColor)' },
-  btnPri:   { font: 'inherit', cursor: 'pointer', border: 'none', background: 'var(--dsw-alias-brand-primary,#4f6ef7)', color: 'var(--dsw-alias-label-primary-foreground,#fff)', height: 32, padding: '0 14px', borderRadius: 999, fontSize: 13, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 4 },
-  btnGhost: { font: 'inherit', cursor: 'pointer', border: '1px solid var(--dsw-alias-border-l2,#d1d5db)', background: 'var(--dsw-alias-bg-layer-2,#f9fafb)', color: 'var(--dsw-alias-label-primary,currentColor)', height: 32, padding: '0 14px', borderRadius: 999, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 4, textDecoration: 'none' },
-  btnLink:  { font: 'inherit', cursor: 'pointer', border: 'none', background: 'none', color: 'var(--dsw-alias-brand-primary,#4f6ef7)', fontSize: 12, padding: 0, display: 'inline-flex', alignItems: 'center', gap: 3, textDecoration: 'none' },
+  muted:    { color: 'var(--dsw-alias-label-tertiary,#6b7280)', fontSize: 12, lineHeight: 1.5 },
+  label:    { color: 'var(--dsw-alias-label-primary,#0f1115)', fontSize: 13, fontWeight: 500 },
+  code:     { fontFamily: 'ui-monospace,Menlo,monospace', fontSize: 12, wordBreak: 'break-all', color: 'var(--dsw-alias-label-primary,#0f1115)' },
+  btnPri:   { font: 'inherit', cursor: 'pointer', border: 'none', background: 'var(--dsw-alias-button-primary-fill,var(--dsw-alias-brand-primary,#4f6ef7))', color: 'var(--dsw-alias-label-primary-foreground,var(--dsw-alias-bg-base,#fff))', height: 32, padding: '0 14px', borderRadius: 999, fontSize: 13, fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: 4 },
+  btnGhost: { font: 'inherit', cursor: 'pointer', border: '1px solid var(--dsw-alias-border-l2,#d1d5db)', background: 'var(--dsw-alias-bg-layer-2,#f9fafb)', color: 'var(--dsw-alias-label-primary,#0f1115)', height: 32, padding: '0 14px', borderRadius: 999, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 4, textDecoration: 'none' },
+  btnLink:  { font: 'inherit', cursor: 'pointer', border: 'none', background: 'none', color: 'var(--dsw-alias-link,#2563eb)', fontSize: 12, padding: 0, display: 'inline-flex', alignItems: 'center', gap: 3, textDecoration: 'none' },
   qr:       { width: 200, height: 200, maxWidth: '100%', borderRadius: 10, border: '1px solid var(--dsw-alias-border-l2,#e5e7eb)', margin: '8px 0', display: 'block', background: '#ffffff', padding: 6, boxSizing: 'border-box' },
   tag:      { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap', flexShrink: 0, minWidth: 'max-content', lineHeight: 1.4 },
-  input:    { width: '100%', font: 'inherit', fontSize: 13, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--dsw-alias-border-l2,#d1d5db)', background: 'var(--dsw-alias-bg-layer-2,#f9fafb)', color: 'var(--dsw-alias-label-primary,currentColor)', outline: 'none', boxSizing: 'border-box' },
+  input:    { width: '100%', font: 'inherit', fontSize: 13, padding: '7px 10px', borderRadius: 8, border: '1px solid var(--dsw-alias-border-l3,#d1d5db)', background: 'var(--dsw-alias-bg-layer-1,#fff)', color: 'var(--dsw-alias-label-primary,#0f1115)', caretColor: 'var(--dsw-alias-label-primary,#0f1115)', WebkitTextFillColor: 'var(--dsw-alias-label-primary,#0f1115)', outline: 'none', boxSizing: 'border-box' },
   warn:     { background: 'var(--dsw-alias-state-warn-bg,#fffbeb)', border: '1px solid var(--dsw-alias-state-warn-border,#fde68a)', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: 'var(--dsw-alias-state-warn-primary,#92400e)', lineHeight: 1.6 },
   err:      { background: 'var(--dsw-alias-state-error-bg,#fef2f2)', border: '1px solid var(--dsw-alias-state-error-border,#fecaca)', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: 'var(--dsw-alias-state-error-primary,#991b1b)', lineHeight: 1.6 },
   tip:      { background: 'var(--dsw-alias-bg-layer-2,#f9fafb)', borderRadius: 8, padding: '10px 14px', fontSize: 12, color: 'var(--dsw-alias-label-secondary,#6b7280)', lineHeight: 1.6 },
@@ -382,7 +386,7 @@ const LanNetworkSelector = React.memo(function LanNetworkSelector({ lan, onSelec
         marginBottom: 6,
         fontSize: 12,
         fontWeight: 500,
-        color: 'var(--dsw-alias-label-primary, currentColor)',
+        color: 'var(--dsw-alias-label-primary, #0f1115)',
       },
     },
       React.createElement('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5 } },
@@ -1292,7 +1296,7 @@ const AccessAuthCard = React.memo(function AccessAuthCard({ auth, rpcCall, onUpd
                   transition: 'all 0.15s ease',
                 },
               },
-                React.createElement('div', { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? 'var(--dsw-alias-brand-primary,#4f6ef7)' : 'var(--dsw-alias-label-primary,currentColor)' } }, opt.title),
+                React.createElement('div', { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? 'var(--dsw-alias-brand-primary,#4f6ef7)' : 'var(--dsw-alias-label-primary,#0f1115)' } }, opt.title),
                 React.createElement('div', { style: { ...s.muted, fontSize: 11, marginTop: 4 } }, opt.desc),
               );
             })
@@ -1322,7 +1326,7 @@ const AccessAuthCard = React.memo(function AccessAuthCard({ auth, rpcCall, onUpd
                   transition: 'all 0.15s ease',
                 },
               },
-                React.createElement('div', { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? 'var(--dsw-alias-brand-primary,#4f6ef7)' : 'var(--dsw-alias-label-primary,currentColor)' } }, opt.title),
+                React.createElement('div', { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? 'var(--dsw-alias-brand-primary,#4f6ef7)' : 'var(--dsw-alias-label-primary,#0f1115)' } }, opt.title),
                 React.createElement('div', { style: { ...s.muted, fontSize: 11, marginTop: 3 } }, opt.desc),
               );
             })
@@ -1402,7 +1406,7 @@ const AccessAuthCard = React.memo(function AccessAuthCard({ auth, rpcCall, onUpd
           React.createElement('div', {
             style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8, marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--dsw-alias-border-l2,#e5e7eb)' },
           },
-            React.createElement('div', { style: { fontSize: 12, fontWeight: 600, color: 'var(--dsw-alias-label-primary,currentColor)' } },
+            React.createElement('div', { style: { fontSize: 12, fontWeight: 600, color: 'var(--dsw-alias-label-primary,#0f1115)' } },
               adminProtection ? '🛡️ 管理保护已开启（修改配置需管理密码）' : '⚠️ 管理保护已关闭（修改配置免密）'
             ),
             React.createElement('button', {
@@ -1476,7 +1480,7 @@ const AccessAuthCard = React.memo(function AccessAuthCard({ auth, rpcCall, onUpd
                   transition: 'all 0.15s ease',
                 },
               },
-                React.createElement('div', { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? 'var(--dsw-alias-brand-primary,#4f6ef7)' : 'var(--dsw-alias-label-primary,currentColor)' } }, opt.title),
+                React.createElement('div', { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? 'var(--dsw-alias-brand-primary,#4f6ef7)' : 'var(--dsw-alias-label-primary,#0f1115)' } }, opt.title),
                 React.createElement('div', { style: { ...s.muted, fontSize: 11, marginTop: 4 } }, opt.desc),
               );
             })
@@ -1835,7 +1839,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall }) {
       React.createElement('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 } },
         (platform.allowFrom?.length
           ? platform.allowFrom.map((id) =>
-              React.createElement('span', { key: id, style: { ...s.tag, background: 'var(--dsw-alias-bg-layer-2,#f3f4f6)', color: 'var(--dsw-alias-label-primary,currentColor)', gap: 6 } },
+              React.createElement('span', { key: id, style: { ...s.tag, background: 'var(--dsw-alias-bg-layer-2,#f3f4f6)', color: 'var(--dsw-alias-label-primary,#0f1115)', gap: 6 } },
                 React.createElement('span', { style: { fontSize: 12, wordBreak: 'break-all' } }, id),
                 React.createElement('button', {
                   style: { cursor: 'pointer', border: 'none', background: 'none', color: 'var(--dsw-alias-state-error-primary,#dc2626)', fontSize: 12, padding: 0 },
@@ -2187,7 +2191,7 @@ function SystemMetricsWidget({ metrics }) {
     React.createElement('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 12, marginBottom: 12 } },
       React.createElement('div', null,
         React.createElement('div', { style: { color: 'var(--dsw-alias-label-tertiary, #9ca3af)', fontSize: 11, marginBottom: 2 } }, 'CPU 核心与型号'),
-        React.createElement('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary, currentColor)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, title: metrics.cpu?.model },
+        React.createElement('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary, #0f1115)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }, title: metrics.cpu?.model },
           `${metrics.cpu?.cores || 0} 核心 (${(metrics.cpu?.model || '').split('@')[0].trim()})`
         ),
       ),
@@ -2199,7 +2203,7 @@ function SystemMetricsWidget({ metrics }) {
       ),
       React.createElement('div', null,
         React.createElement('div', { style: { color: 'var(--dsw-alias-label-tertiary, #9ca3af)', fontSize: 11, marginBottom: 2 } }, 'Node 进程堆内存'),
-        React.createElement('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary, currentColor)' } },
+        React.createElement('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary, #0f1115)' } },
           `${heapMb} MB`
         ),
       ),
@@ -2301,7 +2305,7 @@ function NetworkDiagnosticWidget({ rpcCall }) {
           },
         },
           React.createElement('div', { style: { flex: 1, minWidth: 0 } },
-            React.createElement('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary, currentColor)', marginBottom: 2 } },
+            React.createElement('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary, #0f1115)', marginBottom: 2 } },
               isPass ? '✓ ' : isWarn ? '▲ ' : '✕ ',
               item.name
             ),
@@ -3664,7 +3668,7 @@ function BridgePanel({ rpcCall }) {
               color: 'var(--dsw-alias-label-secondary,#4b5563)', textAlign: 'left', maxWidth: 420, margin: '14px auto 0',
             },
           },
-            React.createElement('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary,currentColor)', marginBottom: 4 } }, '🛟 救急解除锁定指引：'),
+            React.createElement('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary,#0f1115)', marginBottom: 4 } }, '🛟 救急解除锁定指引：'),
             React.createElement('div', null, '1. ', React.createElement('strong', null, '电脑本机直连修改'), '：直接在运行本程序的电脑本机打开本控制台（127.0.0.1 享有物理免锁特权），可随时修改策略或清除密码。'),
             React.createElement('div', { style: { marginTop: 4 } }, '2. ', React.createElement('strong', null, '服务器 / 无头环境'), '：救急重置步骤参见 GitHub README 的「三重容灾保命体系」章节。'),
           ),
@@ -3739,7 +3743,7 @@ function BridgePanel({ rpcCall }) {
               color: 'var(--dsw-alias-label-secondary,#4b5563)', textAlign: 'left',
             },
           },
-            React.createElement('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary,currentColor)', marginBottom: 4 } }, '🛟 找回与重置' + unlockPwdKind + '指引：'),
+            React.createElement('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary,#0f1115)', marginBottom: 4 } }, '🛟 找回与重置' + unlockPwdKind + '指引：'),
             React.createElement('div', null, '1. ', React.createElement('strong', null, '电脑本机直连修改'), '：直接在运行本程序的电脑本机打开本控制台（127.0.0.1 享有物理免锁特权），可随时修改或清除密码。'),
             React.createElement('div', { style: { marginTop: 4 } }, '2. ', React.createElement('strong', null, '服务器 / 无头环境'), '：救急重置步骤参见 GitHub README 的「三重容灾保命体系」章节。'),
           ),
@@ -3840,7 +3844,7 @@ function BridgePanel({ rpcCall }) {
         },
       },
         React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 } },
-          React.createElement('div', { style: { fontSize: 16, fontWeight: 600, color: 'var(--dsw-alias-label-primary,currentColor)', display: 'flex', alignItems: 'center', gap: 8 } },
+          React.createElement('div', { style: { fontSize: 16, fontWeight: 600, color: 'var(--dsw-alias-label-primary,#0f1115)', display: 'flex', alignItems: 'center', gap: 8 } },
             '🔒 解锁后台管理权限'
           ),
           React.createElement('button', {
@@ -4341,7 +4345,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
           <div style="font-size: 11px; color: var(--dsw-alias-label-secondary, #6b7280); margin-bottom: 8px; line-height: 1.5;">远程访问时浏览/添加工作区需输入后台管理密码解锁（与访问密码不同）。</div>
           <form id="dsh-ws-unlock-form" style="display: flex; gap: 8px;">
             <input id="dsh-ws-unlock-input" type="password" placeholder="请输入后台管理密码" value="${escapeHtml(unlockInput)}"
-              style="flex: 1; font: inherit; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, currentColor); outline: none; box-sizing: border-box;" />
+              style="flex: 1; font: inherit; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #0f1115); caret-color: var(--dsw-alias-label-primary, #0f1115); -webkit-text-fill-color: var(--dsw-alias-label-primary, #0f1115); outline: none; box-sizing: border-box;" />
             <button type="submit" style="border: none; background: var(--dsw-static-blue-600, #4f6ef7); color: #fff; border-radius: 8px; padding: 0 14px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;" ${unlocking ? 'disabled' : ''}>${unlocking ? '解锁中…' : '解锁'}</button>
           </form>
           ${unlockErr ? `<div style="font-size: 11px; color: var(--dsw-alias-state-error-primary, #dc2626); margin-top: 6px;">${escapeHtml(unlockErr)}</div>` : ''}
