@@ -47,6 +47,8 @@ Thumbs.db
 .dsh-bridge/
 bin/cloudflared*
 bin/mefrpc*
+# 测试运行时写出的假二进制夹具（见 test/cloudflared-manager-fix.test.mjs 的 writeFileSync）
+test/fixtures/fake-cloudflared.cmd
 
 # Temporary files
 *.tmp

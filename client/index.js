@@ -434,7 +434,7 @@ const CustomTunnelGuide = React.memo(function CustomTunnelGuide() {
 
 // ── 公网入口总览卡：把"当前生效的访问地址"提到页面主角位置 ──────────────
 const TunnelEntryCard = React.memo(function TunnelEntryCard({
-  entry, onCopy, copied, autoStart, onToggleAutoStart, onStart, onStop, onReset,
+  entry, onCopy, copied, autoStart, onToggleAutoStart, onStart, onStop, onReset, onDelete,
 }) {
   const [showQr, setShowQr] = React.useState(false);
   const hasUrl = Boolean(entry && entry.url);
@@ -481,6 +481,17 @@ const TunnelEntryCard = React.memo(function TunnelEntryCard({
           style: { ...s.btnGhost, flexShrink: 0, height: 28, padding: '0 12px', fontSize: 12 },
           onClick: () => onCopy && onCopy(entry.url),
         }, copied ? '✓ 已复制' : '复制'),
+        // 公网地址这一行的删除按钮：仅 mefrp 隧道提供（删掉的是 mefrp 后台的代理记录）。
+        // 放在地址旁而不是塞进「隧道配置」里，是因为用户看到地址的第一反应就是"这条不要了"。
+        onDelete && React.createElement('button', {
+          style: {
+            ...s.btnGhost, flexShrink: 0, height: 28, padding: '0 12px', fontSize: 12,
+            color: 'var(--dsw-alias-state-error-primary,#dc2626)',
+            borderColor: 'var(--dsw-alias-state-error-border,#fecaca)',
+          },
+          onClick: onDelete,
+          title: '删除该 mefrp 隧道（不可撤销，公网地址立即失效）',
+        }, '删除隧道'),
       ),
       // 状态细节（重连/错误/连接中）——无 URL 时格外重要，让用户知道隧道在自愈而非消失
       entry && entry.stateDetail && React.createElement('div', {
@@ -818,7 +829,7 @@ const CloudflareConfigForm = React.memo(function CloudflareConfigForm({ token, h
 
 // mefrp（幻缘映射）隧道配置表单：仅需「访问令牌」即可一键开启；节点与端口默认自动选择，
 // 高级配置可手动指定节点 ID / 远端端口以固定公网地址。
-const MefrpConfigForm = React.memo(function MefrpConfigForm({ accessToken: initToken, nodeId: initNode, remotePort: initPort, nodes, onLoadNodes, onSave }) {
+const MefrpConfigForm = React.memo(function MefrpConfigForm({ accessToken: initToken, nodeId: initNode, remotePort: initPort, nodes, onLoadNodes, onSave, tunnels, onLoadTunnels, onDeleteTunnel }) {
   const [open, setOpen] = React.useState(Boolean(initToken || initNode || initPort));
   const [tokenVal, setTokenVal] = React.useState(initToken || '');
   const [nodeVal, setNodeVal] = React.useState(initNode ? String(initNode) : '');
@@ -827,6 +838,10 @@ const MefrpConfigForm = React.memo(function MefrpConfigForm({ accessToken: initT
   const [msg, setMsg] = React.useState(null);
   const [nodeList, setNodeList] = React.useState(null);
   const [loadingNodes, setLoadingNodes] = React.useState(false);
+  // 隧道列表：展示 mefrp 后台的**全部**隧道（含历次崩溃/重启留下的孤儿隧道），可逐条删除
+  const [tunnelList, setTunnelList] = React.useState(null);
+  const [loadingTunnels, setLoadingTunnels] = React.useState(false);
+  const [deletingId, setDeletingId] = React.useState(0);
 
   React.useEffect(() => {
     setTokenVal(initToken || '');
@@ -838,6 +853,11 @@ const MefrpConfigForm = React.memo(function MefrpConfigForm({ accessToken: initT
   React.useEffect(() => {
     if (Array.isArray(nodes)) setNodeList(nodes);
   }, [nodes]);
+
+  // 隧道列表同理：删除/刷新后服务端把状态整体回传，这里跟随更新
+  React.useEffect(() => {
+    if (Array.isArray(tunnels)) setTunnelList(tunnels);
+  }, [tunnels]);
 
   const loadNodes = async () => {
     setLoadingNodes(true);
@@ -852,6 +872,48 @@ const MefrpConfigForm = React.memo(function MefrpConfigForm({ accessToken: initT
       setLoadingNodes(false);
     }
   };
+
+  // 拉取 mefrp 后台的隧道列表。默认展开列表时才第一次拉，避免每次进「隧道」页都打 API。
+  const loadTunnels = async () => {
+    setLoadingTunnels(true);
+    setMsg(null);
+    try {
+      const list = await onLoadTunnels(tokenVal);
+      setTunnelList(Array.isArray(list) ? list : []);
+      if (!list || !list.length) setMsg({ ok: true, text: '后台没有隧道' });
+    } catch (e) {
+      setMsg({ ok: false, text: e.message || '加载隧道列表失败' });
+    } finally {
+      setLoadingTunnels(false);
+    }
+  };
+
+  // 删除隧道：二次确认（不可逆：删掉后该公网地址立即失效）。
+  // 删的是当前正在用的那条时，服务端会连带停掉隧道，这里随后刷新一次列表。
+  const handleDeleteTunnel = async (t) => {
+    const label = [t.proxyName || ('隧道 #' + t.proxyId), t.url].filter(Boolean).join('\n');
+    const extra = t.active ? '\n\n⚠️ 这是**当前正在使用**的隧道，删除后会同时关闭隧道，公网地址立即失效。' : '';
+    if (!window.confirm('确认删除该 mefrp 隧道？此操作不可撤销。\n\n' + label + extra)) return;
+    setDeletingId(t.proxyId);
+    setMsg(null);
+    try {
+      await onDeleteTunnel(t.proxyId, tokenVal);
+      setTunnelList((prev) => (Array.isArray(prev) ? prev.filter((x) => x.proxyId !== t.proxyId) : prev));
+      setMsg({ ok: true, text: '✓ 已删除隧道 #' + t.proxyId });
+    } catch (e) {
+      setMsg({ ok: false, text: e.message || '删除隧道失败' });
+    } finally {
+      setDeletingId(0);
+    }
+  };
+
+  // 展开高级配置时自动拉一次隧道列表（有令牌才拉），让用户一眼看到后台堆积的旧隧道
+  React.useEffect(() => {
+    if (open && tunnelList == null && initToken) loadTunnels();
+    // 依赖刻意只留 open：initToken 后续变化不该重复拉取，tunnelList 有值后更不该再触发。
+    // 原先这里写 react-hooks/exhaustive-deps 压制注释，但本仓库 eslint 未接入该插件，
+    // 该注释反而触发 "Definition for rule was not found" 报错，故改为普通说明。
+  }, [open]);
 
   // 节点行样式。兜底一律「浅底深字」，避免宿主无主题变量时出现白底白字。
   const rowStyle = (selected, offline) => ({
@@ -990,6 +1052,81 @@ const MefrpConfigForm = React.memo(function MefrpConfigForm({ accessToken: initT
           value: portVal,
           onChange: (e) => setPortVal(e.target.value),
         }),
+      ),
+      // ── 隧道列表：mefrp 后台的**全部**隧道（含历次崩溃/重启留下的孤儿隧道），可逐条删除 ──
+      // 背景：MefrpManager.stop() 会删掉自己创建的代理，但进程被强杀 / 插件重启导致内存里的
+      // createdProxy 丢失时，代理就永远留在服务端了。免费账号名额有限（默认 2 个），
+      // 反复重试几次就会把名额占满（之后开启会直接报「名额已满」），所以必须给用户一个清理入口。
+      React.createElement('div', { style: { marginBottom: 8 } },
+        React.createElement('div', {
+          style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 6 },
+        },
+          React.createElement('span', { style: { fontSize: 12, color: 'var(--dsw-alias-label-secondary,#4b5563)' } },
+            '隧道列表：',
+            React.createElement('span', { style: { color: 'var(--dsw-alias-label-primary,#0f1115)', fontWeight: 500 } },
+              Array.isArray(tunnelList) ? (tunnelList.length + ' 条') : '未加载'),
+          ),
+          React.createElement('button', {
+            type: 'button',
+            style: { ...s.btnGhost, height: 24, fontSize: 11, padding: '0 10px', flexShrink: 0 },
+            disabled: loadingTunnels,
+            onClick: loadTunnels,
+          }, loadingTunnels ? '加载中…' : '🔄 刷新隧道列表'),
+        ),
+        React.createElement('div', {
+          style: { fontSize: 11, color: 'var(--dsw-alias-label-tertiary,#8b93a1)', marginBottom: 6, lineHeight: 1.5 },
+        }, '删除不再使用的旧隧道可释放名额（免费账号名额有限）。异常退出留下的隧道不会自动清理，会一直占着名额。'),
+        Array.isArray(tunnelList) && tunnelList.length === 0 && React.createElement('div', {
+          style: { fontSize: 12, color: 'var(--dsw-alias-label-tertiary,#8b93a1)', padding: '6px 2px' },
+        }, '暂无隧道'),
+        Array.isArray(tunnelList) && tunnelList.length > 0 && React.createElement('div', {
+          style: {
+            maxHeight: 220, overflowY: 'auto', borderRadius: 8,
+            border: '1px solid var(--dsw-alias-border-l2,#e5e7eb)',
+            background: 'var(--dsw-alias-bg-layer-1,#fff)',
+          },
+        },
+          tunnelList.map((t) => React.createElement('div', {
+            key: t.proxyId,
+            style: {
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
+              padding: '7px 10px', fontSize: 12,
+              borderBottom: '1px solid var(--dsw-alias-border-l2,#eef0f3)',
+            },
+          },
+            React.createElement('div', { style: { minWidth: 0, flex: '1 1 auto' } },
+              React.createElement('div', {
+                style: { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: 'var(--dsw-alias-label-primary,#0f1115)' },
+                title: t.proxyName || '',
+              }, t.proxyName || ('隧道 #' + t.proxyId)),
+              React.createElement('div', {
+                style: { fontSize: 11, color: 'var(--dsw-alias-label-tertiary,#6b7280)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginTop: 2 },
+                title: t.url || '',
+              }, (t.url || '地址未知') + ' · 节点 #' + t.nodeId + ' · 本地端口 ' + t.localPort),
+            ),
+            React.createElement('span', { style: { display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 } },
+              t.active && React.createElement('span', {
+                style: {
+                  fontSize: 10, lineHeight: 1.6, padding: '1px 6px', borderRadius: 999,
+                  background: 'var(--dsw-alias-state-success-bg,#dcfce7)',
+                  color: 'var(--dsw-alias-state-success-primary,#059669)',
+                },
+              }, '当前'),
+              React.createElement('button', {
+                type: 'button',
+                style: {
+                  ...s.btnGhost, height: 24, fontSize: 11, padding: '0 10px', flexShrink: 0,
+                  color: 'var(--dsw-alias-state-error-primary,#dc2626)',
+                  borderColor: 'var(--dsw-alias-state-error-border,#fecaca)',
+                  opacity: deletingId === t.proxyId ? 0.5 : 1,
+                },
+                disabled: deletingId === t.proxyId,
+                onClick: () => handleDeleteTunnel(t),
+                title: '删除该隧道（不可撤销）',
+              }, deletingId === t.proxyId ? '删除中…' : '删除'),
+            ),
+          )),
+        ),
       ),
       React.createElement('div', { style: { display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' } },
         React.createElement('button', {
@@ -3452,6 +3589,21 @@ function BridgePanel({ rpcCall }) {
     return r.value?.mefrpNodes ?? [];
   }, [authRpcCall]);
 
+  // 隧道列表 / 删除同样走 authRpcCall：失败必须抛给表单显示（act 会吞错误，用户会看到「点了没反应」）
+  const loadMefrpTunnels = React.useCallback(async (accessToken) => {
+    const r = await authRpcCall(BRIDGE_ENDPOINTS.listMefrpTunnels, { accessToken });
+    if (!r?.ok) throw new Error(r?.error?.message ?? '加载隧道列表失败');
+    setStatus(r.value);
+    return r.value?.mefrpTunnels ?? [];
+  }, [authRpcCall]);
+
+  const deleteMefrpTunnel = React.useCallback(async (proxyId, accessToken) => {
+    const r = await authRpcCall(BRIDGE_ENDPOINTS.deleteMefrpTunnel, { proxyId, accessToken });
+    if (!r?.ok) throw new Error(r?.error?.message ?? '删除隧道失败');
+    setStatus(r.value);
+    return true;
+  }, [authRpcCall]);
+
   const onSelectLanIp = React.useCallback((ip) => act(BRIDGE_ENDPOINTS.setLanIp, { ip }), [act]);
 
   const onStartCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.startCustomTunnel), [act]);
@@ -3534,6 +3686,17 @@ function BridgePanel({ rpcCall }) {
         autoStart: mf.autoStart, onToggleAutoStart: onToggleMefrpAutoStart,
         onStart: onStartMefrp, onStop: onStopMefrp,
         onReset: onResetMefrp,
+        // 公网地址行的删除按钮：删的是 mefrp 后台的代理记录（不可撤销）。
+        // mf.proxyId 只有本次运行真的创建了代理才存在，缺失就不给按钮。
+        onDelete: mf.proxyId ? () => {
+          if (!window.confirm('确认删除当前 mefrp 隧道？\n\n删除后公网地址立即失效，隧道也会被关闭。')) return;
+          // 成功不必另发提示：deleteMefrpTunnel 已把最新状态 setStatus 进面板，
+          // 该入口卡片会随 mefrp.running 变 false 自行消失，本身就是成功反馈。
+          // 失败则复用面板顶部已有的错误条（setErr）。
+          deleteMefrpTunnel(mf.proxyId, mf.token || '')
+            .then(() => setErr(null))
+            .catch((e) => setErr(e.message || '删除隧道失败'));
+        } : undefined,
       },
       ext && ext.configured && ext.url && {
         key: 'external', title: '外部已部署隧道', desc: '自行部署登记',
@@ -3553,6 +3716,7 @@ function BridgePanel({ rpcCall }) {
         onStart: primary ? primary.onStart : (cf ? onStartCloudflared : null),
         onStop: primary ? primary.onStop : undefined,
         onReset: primary ? primary.onReset : undefined,
+        onDelete: primary ? primary.onDelete : undefined,
       }),
       otherCount > 0 && React.createElement('div', {
         style: { ...s.muted, fontSize: 11, marginBottom: 8, textAlign: 'center' },
@@ -3608,6 +3772,9 @@ function BridgePanel({ rpcCall }) {
             nodes: status && status.mefrpNodes,
             onLoadNodes: loadMefrpNodes,
             onSave: saveMefrpConfig,
+            tunnels: status && status.mefrpTunnels,
+            onLoadTunnels: loadMefrpTunnels,
+            onDeleteTunnel: deleteMefrpTunnel,
           }),
         ),
         React.createElement(TunnelCard, {
@@ -4070,10 +4237,40 @@ function setupMobileExperience(rpcCall, ctx) {
       if (dshNewBtn) dshNewBtn.click();
     };
 
+    // 顶栏扩展插槽（右）：宿主 App（如 LunaShare 的 Link WebView）在此注入自己的按钮。
+    // 插件只提供容器与位置，按钮由宿主自绘，宿主无需改动插件即可扩展顶栏；
+    // 插槽为空时不占位（见 mobile-styles.js）。
+    const extrasSlot = document.createElement('div');
+    extrasSlot.className = 'dsh-mobile-header-extras';
+
+    // 顶栏扩展插槽（左）：与右侧插槽对称，位置在「菜单」与标题之间。
+    // 宿主可以按自己的语义把按钮分到两侧（LunaShare：左=主页/缩放复位/连接抽屉，
+    // 右=会话侧边栏），所以这里给两个容器而不是一个。
+    const extrasLeftSlot = document.createElement('div');
+    extrasLeftSlot.className = 'dsh-mobile-header-extras-left';
+
     header.appendChild(leftBtn);
+    header.appendChild(extrasLeftSlot);
     header.appendChild(titleEl);
+    header.appendChild(extrasSlot);
     header.appendChild(rightBtn);
     document.body.appendChild(header);
+  } else {
+    // header 已存在（HMR / 旧版注入 / 宿主提前创建）：补齐缺失的扩展插槽
+    if (!header.querySelector('.dsh-mobile-header-extras')) {
+      const slot = document.createElement('div');
+      slot.className = 'dsh-mobile-header-extras';
+      const newBtn = header.querySelector('.dsh-header-new-btn');
+      if (newBtn) header.insertBefore(slot, newBtn);
+      else header.appendChild(slot);
+    }
+    if (!header.querySelector('.dsh-mobile-header-extras-left')) {
+      const slotL = document.createElement('div');
+      slotL.className = 'dsh-mobile-header-extras-left';
+      const menuBtn = header.querySelector('.dsh-header-menu-btn');
+      if (menuBtn && menuBtn.parentNode === header) header.insertBefore(slotL, menuBtn.nextSibling);
+      else header.insertBefore(slotL, header.firstChild);
+    }
   }
 
   // 绑定会话标题实时同步 (切换会话或收到首条回复自动更新)
@@ -4288,11 +4485,14 @@ function setupMobileExperience(rpcCall, ctx) {
     const deltaY = e.changedTouches[0].clientY - touchStartY;
 
     if (Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
-      if (deltaX > 0 && touchStartX <= 35) {
+      // 抽屉贴**右**侧（见 mobile-styles.js 的 div[class*="_sidebarCol"]），
+      // 所以边缘手势也要跟着换向：从右边缘向左滑 → 打开；向右滑 → 关闭。
+      const viewportW = window.innerWidth;
+      if (deltaX < 0 && touchStartX >= viewportW - 35) {
         document.body.classList.add('dsh-drawer-open');
         const collapsedToggle = document.querySelector('div[class*="hHd-Xa_collapsed"] button[class*="hHd-Xa_toggle"]');
         if (collapsedToggle) collapsedToggle.click();
-      } else if (deltaX < 0 && document.body.classList.contains('dsh-drawer-open')) {
+      } else if (deltaX > 0 && document.body.classList.contains('dsh-drawer-open')) {
         document.body.classList.remove('dsh-drawer-open');
       }
     }

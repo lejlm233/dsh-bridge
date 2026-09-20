@@ -18,6 +18,10 @@ export const MOBILE_STYLES_CSS = `
       --dsh-mobile-header-h: 52px;
       --dsh-mobile-safe-top: env(safe-area-inset-top, 0px);
       --dsh-mobile-safe-bottom: env(safe-area-inset-bottom, 0px);
+      /* 顶栏实际占位高度 = 内容高 + 安全区。宿主 App（如 LunaShare 的 Link WebView）
+         会把真实状态栏高度写入 --dsh-mobile-safe-top；此处统一用 total，
+         避免 box-sizing:border-box 下 padding-top 把顶栏内容压扁。 */
+      --dsh-mobile-header-total: calc(var(--dsh-mobile-header-h) + var(--dsh-mobile-safe-top));
     }
 
     /* 断点与宿主判据对齐：宿主用 viewportWidth < 768 决定右侧栏自动全屏
@@ -31,7 +35,7 @@ export const MOBILE_STYLES_CSS = `
         width: 100vw !important;
         height: 100dvh !important;
         margin: 0 !important;
-        padding-top: var(--dsh-mobile-header-h) !important;
+        padding-top: var(--dsh-mobile-header-total) !important;
         position: relative !important;
         grid-template-columns: 1fr !important;
         overflow: hidden !important;
@@ -46,9 +50,9 @@ export const MOBILE_STYLES_CSS = `
          宿主当前用 inset:0（无显式高度）时 top 单独即可，但宿主将来若给出显式高度，
          显式 height 仍能把盒子收在顶栏之下。 */
       [data-sidebar-right-panel="fullscreen"] {
-        top: var(--dsh-mobile-header-h, 52px) !important;
-        height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
-        max-height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
+        top: var(--dsh-mobile-header-total, 52px) !important;
+        height: calc(100dvh - var(--dsh-mobile-header-total, 52px)) !important;
+        max-height: calc(100dvh - var(--dsh-mobile-header-total, 52px)) !important;
       }
 
       /* 2. 顶部原生导航条：100% 还原 DeepSeek App (左侧双横线，右侧(+)，中间留白，无多余设置按钮) */
@@ -57,7 +61,7 @@ export const MOBILE_STYLES_CSS = `
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
-        height: var(--dsh-mobile-header-h) !important;
+        height: var(--dsh-mobile-header-total) !important;
         padding-top: var(--dsh-mobile-safe-top) !important;
         background: transparent !important;
         display: flex !important;
@@ -91,6 +95,15 @@ export const MOBILE_STYLES_CSS = `
         opacity: 0.6;
       }
 
+      /* 宿主接管顶栏按钮时，隐藏本插件自己的左侧「双横线」菜单按钮。
+         宿主（LunaShare 的 Link WebView）会往右插槽注入自己的「会话侧边栏」按钮，
+         与本按钮功能完全重复（都是切 body 上的 dsh-drawer-open）——两个按钮开同一个抽屉，
+         用户观感是"怎么有两个入口"。宿主注入脚本给 <html> 打上 .luna-host 作为接管标志，
+         此时让位；手机浏览器直开 DSH 控制台（无宿主）时按钮照旧存在，不影响原用法。 */
+      html.luna-host .dsh-header-menu-btn {
+        display: none !important;
+      }
+
       /* 右侧 (+) 新建会话按钮 (DeepSeek App 原生图标) */
       .dsh-header-new-btn {
         width: 40px;
@@ -108,6 +121,42 @@ export const MOBILE_STYLES_CSS = `
         pointer-events: auto !important;
       }
       .dsh-header-new-btn:active {
+        opacity: 0.6;
+      }
+
+      /* 顶栏扩展插槽（左右各一）：宿主 App（如 LunaShare 的 Link WebView）在此注入自己的按钮。
+         插件只提供容器与位置，按钮内容由宿主自绘，因此宿主无需改动插件即可扩展顶栏；
+         插槽为空时不占位。左槽在「菜单」与标题之间，右槽在标题与「+」之间——
+         宿主可以按自己的语义把按钮分到两侧（LunaShare：左=主页/缩放复位/连接，右=会话侧边栏）。 */
+      .dsh-mobile-header-extras,
+      .dsh-mobile-header-extras-left {
+        display: none;
+        align-items: center;
+        gap: 2px;
+        flex: 0 0 auto;
+        pointer-events: auto !important;
+      }
+      .dsh-mobile-header-extras:not(:empty),
+      .dsh-mobile-header-extras-left:not(:empty) {
+        display: inline-flex;
+      }
+      .dsh-mobile-header-extras > button,
+      .dsh-mobile-header-extras-left > button {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--dsw-alias-label-primary, #111827);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        cursor: pointer;
+        transition: opacity 0.15s;
+      }
+      .dsh-mobile-header-extras > button:active,
+      .dsh-mobile-header-extras-left > button:active {
         opacity: 0.6;
       }
 
@@ -169,9 +218,9 @@ export const MOBILE_STYLES_CSS = `
         display: flex !important;
         visibility: visible !important;
         pointer-events: auto !important;
-        top: var(--dsh-mobile-header-h, 52px) !important;
-        height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
-        max-height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
+        top: var(--dsh-mobile-header-total, 52px) !important;
+        height: calc(100dvh - var(--dsh-mobile-header-total, 52px)) !important;
+        max-height: calc(100dvh - var(--dsh-mobile-header-total, 52px)) !important;
         z-index: 50 !important;
         box-sizing: border-box !important;
         background: var(--dsw-alias-bg-layer-1, #ffffff) !important;
@@ -548,10 +597,13 @@ export const MOBILE_STYLES_CSS = `
         min-width: 0 !important;
       }
 
-      /* 4. 原生侧边栏抽屉化 (Drawer) */
+      /* 4. 原生侧边栏抽屉化 (Drawer)：贴**右**侧滑入。
+         在 LunaShare 的 Link WebView 里，宿主把「会话侧边栏」按钮放在顶栏右侧（紧邻 +），
+         因此面板也从右侧滑入，与按钮同侧（按钮在右、面板却从左出会让人以为点错了）。 */
       div[class*="_sidebarCol"] {
         position: fixed !important;
-        left: 0 !important;
+        right: 0 !important;
+        left: auto !important;
         top: 0 !important;
         bottom: 0 !important;
         height: 100dvh !important;
@@ -559,15 +611,15 @@ export const MOBILE_STYLES_CSS = `
         max-width: 82vw !important;
         z-index: 10000 !important;
         background: var(--dsw-alias-bg-layer-1, #ffffff) !important;
-        transform: translateX(-105%);
+        transform: translateX(105%);
         transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         overflow-y: auto !important;
-        border-right: 1px solid rgba(0, 0, 0, 0.06) !important;
+        border-left: 1px solid rgba(0, 0, 0, 0.06) !important;
         pointer-events: auto !important;
       }
       body.dsh-drawer-open div[class*="_sidebarCol"] {
         transform: translateX(0) !important;
-        box-shadow: 4px 0 28px rgba(0, 0, 0, 0.25) !important;
+        box-shadow: -4px 0 28px rgba(0, 0, 0, 0.25) !important;
         pointer-events: auto !important;
       }
 

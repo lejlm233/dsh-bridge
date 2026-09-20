@@ -84,18 +84,18 @@ test('fixed 全屏面板在移动端块内单独让位 header 高度', () => {
 
   assert.match(
     body,
-    /[;{\s]top:\s*var\(--dsh-mobile-header-h,\s*52px\)\s*!important/,
+    /[;{\s]top:\s*var\(--dsh-mobile-header-total,\s*52px\)\s*!important/,
     '应把面板自身 top 顶到 header 高度（!important 覆盖宿主的 inset:0）',
   );
   // 注意前置字符类：`max-height:` 里也含 "height:"，不加边界会漏掉 height 被删的回归
   assert.match(
     body,
-    /[;{\s]height:\s*calc\(100dvh - var\(--dsh-mobile-header-h,\s*52px\)\)\s*!important/,
+    /[;{\s]height:\s*calc\(100dvh - var\(--dsh-mobile-header-total,\s*52px\)\)\s*!important/,
     '应同步收窄高度，避免面板超出视口底部',
   );
   assert.match(
     body,
-    /[;{\s]max-height:\s*calc\(100dvh - var\(--dsh-mobile-header-h,\s*52px\)\)\s*!important/,
+    /[;{\s]max-height:\s*calc\(100dvh - var\(--dsh-mobile-header-total,\s*52px\)\)\s*!important/,
     '应同步收窄 max-height（与工作台面板让位写法一致）',
   );
 
@@ -111,23 +111,32 @@ test('让位量与实际顶栏盒高同源（52px 变量未被改成 0 或脱离
     '顶栏高度变量应仍为 52px',
   );
 
+  // 安全区修复：顶栏总高必须显式叠加 safe-top。否则 box-sizing:border-box 下
+  // height:52px + padding-top:<安全区> 会把顶栏内容压扁——宿主 App（LunaShare Link
+  // 等）把真实状态栏高度写进 --dsh-mobile-safe-top 后就会暴露。
+  assert.match(
+    structureCss,
+    /--dsh-mobile-header-total:\s*calc\(var\(--dsh-mobile-header-h\)\s*\+\s*var\(--dsh-mobile-safe-top\)\)/,
+    '顶栏总高应为 header-h + safe-top，宿主注入安全区后才不会被压扁',
+  );
+
   const header = ruleBody(structureCss, '.dsh-mobile-app-header');
   assert.ok(header, '应存在顶栏规则');
   assert.match(
     header,
-    /[;{\s]height:\s*var\(--dsh-mobile-header-h\)\s*!important/,
+    /[;{\s]height:\s*var\(--dsh-mobile-header-total\)\s*!important/,
     '顶栏高度必须与被让位的 52px 用同一个变量，二者才不会各自漂移',
   );
 
   const frame = ruleBody(mediaBlock(structureCss, '(max-width: 767px)'), 'div[class*="_frame"]');
   assert.match(
     frame,
-    /[;{\s]padding-top:\s*var\(--dsh-mobile-header-h\)\s*!important/,
+    /[;{\s]padding-top:\s*var\(--dsh-mobile-header-total\)\s*!important/,
     '流内内容的让位也必须用同一个变量',
   );
 
   const panel = ruleBody(mediaBlock(structureCss, '(max-width: 767px)'), '[data-sidebar-right-panel="fullscreen"]');
-  assert.match(panel, /var\(--dsh-mobile-header-h,\s*52px\)/, '面板让位量必须来自同一个变量');
+  assert.match(panel, /var\(--dsh-mobile-header-total,\s*52px\)/, '面板让位量必须来自同一个变量');
 });
 
 test('运行时断点常量与 CSS 一致，且不再散落魔法值', () => {

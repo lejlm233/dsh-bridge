@@ -49,6 +49,10 @@ var MOBILE_STYLES_CSS = `
       --dsh-mobile-header-h: 52px;
       --dsh-mobile-safe-top: env(safe-area-inset-top, 0px);
       --dsh-mobile-safe-bottom: env(safe-area-inset-bottom, 0px);
+      /* \u9876\u680F\u5B9E\u9645\u5360\u4F4D\u9AD8\u5EA6 = \u5185\u5BB9\u9AD8 + \u5B89\u5168\u533A\u3002\u5BBF\u4E3B App\uFF08\u5982 LunaShare \u7684 Link WebView\uFF09
+         \u4F1A\u628A\u771F\u5B9E\u72B6\u6001\u680F\u9AD8\u5EA6\u5199\u5165 --dsh-mobile-safe-top\uFF1B\u6B64\u5904\u7EDF\u4E00\u7528 total\uFF0C
+         \u907F\u514D box-sizing:border-box \u4E0B padding-top \u628A\u9876\u680F\u5185\u5BB9\u538B\u6241\u3002 */
+      --dsh-mobile-header-total: calc(var(--dsh-mobile-header-h) + var(--dsh-mobile-safe-top));
     }
 
     /* \u65AD\u70B9\u4E0E\u5BBF\u4E3B\u5224\u636E\u5BF9\u9F50\uFF1A\u5BBF\u4E3B\u7528 viewportWidth < 768 \u51B3\u5B9A\u53F3\u4FA7\u680F\u81EA\u52A8\u5168\u5C4F
@@ -62,7 +66,7 @@ var MOBILE_STYLES_CSS = `
         width: 100vw !important;
         height: 100dvh !important;
         margin: 0 !important;
-        padding-top: var(--dsh-mobile-header-h) !important;
+        padding-top: var(--dsh-mobile-header-total) !important;
         position: relative !important;
         grid-template-columns: 1fr !important;
         overflow: hidden !important;
@@ -77,9 +81,9 @@ var MOBILE_STYLES_CSS = `
          \u5BBF\u4E3B\u5F53\u524D\u7528 inset:0\uFF08\u65E0\u663E\u5F0F\u9AD8\u5EA6\uFF09\u65F6 top \u5355\u72EC\u5373\u53EF\uFF0C\u4F46\u5BBF\u4E3B\u5C06\u6765\u82E5\u7ED9\u51FA\u663E\u5F0F\u9AD8\u5EA6\uFF0C
          \u663E\u5F0F height \u4ECD\u80FD\u628A\u76D2\u5B50\u6536\u5728\u9876\u680F\u4E4B\u4E0B\u3002 */
       [data-sidebar-right-panel="fullscreen"] {
-        top: var(--dsh-mobile-header-h, 52px) !important;
-        height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
-        max-height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
+        top: var(--dsh-mobile-header-total, 52px) !important;
+        height: calc(100dvh - var(--dsh-mobile-header-total, 52px)) !important;
+        max-height: calc(100dvh - var(--dsh-mobile-header-total, 52px)) !important;
       }
 
       /* 2. \u9876\u90E8\u539F\u751F\u5BFC\u822A\u6761\uFF1A100% \u8FD8\u539F DeepSeek App (\u5DE6\u4FA7\u53CC\u6A2A\u7EBF\uFF0C\u53F3\u4FA7(+)\uFF0C\u4E2D\u95F4\u7559\u767D\uFF0C\u65E0\u591A\u4F59\u8BBE\u7F6E\u6309\u94AE) */
@@ -88,7 +92,7 @@ var MOBILE_STYLES_CSS = `
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
-        height: var(--dsh-mobile-header-h) !important;
+        height: var(--dsh-mobile-header-total) !important;
         padding-top: var(--dsh-mobile-safe-top) !important;
         background: transparent !important;
         display: flex !important;
@@ -122,6 +126,15 @@ var MOBILE_STYLES_CSS = `
         opacity: 0.6;
       }
 
+      /* \u5BBF\u4E3B\u63A5\u7BA1\u9876\u680F\u6309\u94AE\u65F6\uFF0C\u9690\u85CF\u672C\u63D2\u4EF6\u81EA\u5DF1\u7684\u5DE6\u4FA7\u300C\u53CC\u6A2A\u7EBF\u300D\u83DC\u5355\u6309\u94AE\u3002
+         \u5BBF\u4E3B\uFF08LunaShare \u7684 Link WebView\uFF09\u4F1A\u5F80\u53F3\u63D2\u69FD\u6CE8\u5165\u81EA\u5DF1\u7684\u300C\u4F1A\u8BDD\u4FA7\u8FB9\u680F\u300D\u6309\u94AE\uFF0C
+         \u4E0E\u672C\u6309\u94AE\u529F\u80FD\u5B8C\u5168\u91CD\u590D\uFF08\u90FD\u662F\u5207 body \u4E0A\u7684 dsh-drawer-open\uFF09\u2014\u2014\u4E24\u4E2A\u6309\u94AE\u5F00\u540C\u4E00\u4E2A\u62BD\u5C49\uFF0C
+         \u7528\u6237\u89C2\u611F\u662F"\u600E\u4E48\u6709\u4E24\u4E2A\u5165\u53E3"\u3002\u5BBF\u4E3B\u6CE8\u5165\u811A\u672C\u7ED9 <html> \u6253\u4E0A .luna-host \u4F5C\u4E3A\u63A5\u7BA1\u6807\u5FD7\uFF0C
+         \u6B64\u65F6\u8BA9\u4F4D\uFF1B\u624B\u673A\u6D4F\u89C8\u5668\u76F4\u5F00 DSH \u63A7\u5236\u53F0\uFF08\u65E0\u5BBF\u4E3B\uFF09\u65F6\u6309\u94AE\u7167\u65E7\u5B58\u5728\uFF0C\u4E0D\u5F71\u54CD\u539F\u7528\u6CD5\u3002 */
+      html.luna-host .dsh-header-menu-btn {
+        display: none !important;
+      }
+
       /* \u53F3\u4FA7 (+) \u65B0\u5EFA\u4F1A\u8BDD\u6309\u94AE (DeepSeek App \u539F\u751F\u56FE\u6807) */
       .dsh-header-new-btn {
         width: 40px;
@@ -139,6 +152,42 @@ var MOBILE_STYLES_CSS = `
         pointer-events: auto !important;
       }
       .dsh-header-new-btn:active {
+        opacity: 0.6;
+      }
+
+      /* \u9876\u680F\u6269\u5C55\u63D2\u69FD\uFF08\u5DE6\u53F3\u5404\u4E00\uFF09\uFF1A\u5BBF\u4E3B App\uFF08\u5982 LunaShare \u7684 Link WebView\uFF09\u5728\u6B64\u6CE8\u5165\u81EA\u5DF1\u7684\u6309\u94AE\u3002
+         \u63D2\u4EF6\u53EA\u63D0\u4F9B\u5BB9\u5668\u4E0E\u4F4D\u7F6E\uFF0C\u6309\u94AE\u5185\u5BB9\u7531\u5BBF\u4E3B\u81EA\u7ED8\uFF0C\u56E0\u6B64\u5BBF\u4E3B\u65E0\u9700\u6539\u52A8\u63D2\u4EF6\u5373\u53EF\u6269\u5C55\u9876\u680F\uFF1B
+         \u63D2\u69FD\u4E3A\u7A7A\u65F6\u4E0D\u5360\u4F4D\u3002\u5DE6\u69FD\u5728\u300C\u83DC\u5355\u300D\u4E0E\u6807\u9898\u4E4B\u95F4\uFF0C\u53F3\u69FD\u5728\u6807\u9898\u4E0E\u300C+\u300D\u4E4B\u95F4\u2014\u2014
+         \u5BBF\u4E3B\u53EF\u4EE5\u6309\u81EA\u5DF1\u7684\u8BED\u4E49\u628A\u6309\u94AE\u5206\u5230\u4E24\u4FA7\uFF08LunaShare\uFF1A\u5DE6=\u4E3B\u9875/\u7F29\u653E\u590D\u4F4D/\u8FDE\u63A5\uFF0C\u53F3=\u4F1A\u8BDD\u4FA7\u8FB9\u680F\uFF09\u3002 */
+      .dsh-mobile-header-extras,
+      .dsh-mobile-header-extras-left {
+        display: none;
+        align-items: center;
+        gap: 2px;
+        flex: 0 0 auto;
+        pointer-events: auto !important;
+      }
+      .dsh-mobile-header-extras:not(:empty),
+      .dsh-mobile-header-extras-left:not(:empty) {
+        display: inline-flex;
+      }
+      .dsh-mobile-header-extras > button,
+      .dsh-mobile-header-extras-left > button {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 50%;
+        background: transparent;
+        color: var(--dsw-alias-label-primary, #111827);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        cursor: pointer;
+        transition: opacity 0.15s;
+      }
+      .dsh-mobile-header-extras > button:active,
+      .dsh-mobile-header-extras-left > button:active {
         opacity: 0.6;
       }
 
@@ -200,9 +249,9 @@ var MOBILE_STYLES_CSS = `
         display: flex !important;
         visibility: visible !important;
         pointer-events: auto !important;
-        top: var(--dsh-mobile-header-h, 52px) !important;
-        height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
-        max-height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
+        top: var(--dsh-mobile-header-total, 52px) !important;
+        height: calc(100dvh - var(--dsh-mobile-header-total, 52px)) !important;
+        max-height: calc(100dvh - var(--dsh-mobile-header-total, 52px)) !important;
         z-index: 50 !important;
         box-sizing: border-box !important;
         background: var(--dsw-alias-bg-layer-1, #ffffff) !important;
@@ -579,10 +628,13 @@ var MOBILE_STYLES_CSS = `
         min-width: 0 !important;
       }
 
-      /* 4. \u539F\u751F\u4FA7\u8FB9\u680F\u62BD\u5C49\u5316 (Drawer) */
+      /* 4. \u539F\u751F\u4FA7\u8FB9\u680F\u62BD\u5C49\u5316 (Drawer)\uFF1A\u8D34**\u53F3**\u4FA7\u6ED1\u5165\u3002
+         \u5728 LunaShare \u7684 Link WebView \u91CC\uFF0C\u5BBF\u4E3B\u628A\u300C\u4F1A\u8BDD\u4FA7\u8FB9\u680F\u300D\u6309\u94AE\u653E\u5728\u9876\u680F\u53F3\u4FA7\uFF08\u7D27\u90BB +\uFF09\uFF0C
+         \u56E0\u6B64\u9762\u677F\u4E5F\u4ECE\u53F3\u4FA7\u6ED1\u5165\uFF0C\u4E0E\u6309\u94AE\u540C\u4FA7\uFF08\u6309\u94AE\u5728\u53F3\u3001\u9762\u677F\u5374\u4ECE\u5DE6\u51FA\u4F1A\u8BA9\u4EBA\u4EE5\u4E3A\u70B9\u9519\u4E86\uFF09\u3002 */
       div[class*="_sidebarCol"] {
         position: fixed !important;
-        left: 0 !important;
+        right: 0 !important;
+        left: auto !important;
         top: 0 !important;
         bottom: 0 !important;
         height: 100dvh !important;
@@ -590,15 +642,15 @@ var MOBILE_STYLES_CSS = `
         max-width: 82vw !important;
         z-index: 10000 !important;
         background: var(--dsw-alias-bg-layer-1, #ffffff) !important;
-        transform: translateX(-105%);
+        transform: translateX(105%);
         transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         overflow-y: auto !important;
-        border-right: 1px solid rgba(0, 0, 0, 0.06) !important;
+        border-left: 1px solid rgba(0, 0, 0, 0.06) !important;
         pointer-events: auto !important;
       }
       body.dsh-drawer-open div[class*="_sidebarCol"] {
         transform: translateX(0) !important;
-        box-shadow: 4px 0 28px rgba(0, 0, 0, 0.25) !important;
+        box-shadow: -4px 0 28px rgba(0, 0, 0, 0.25) !important;
         pointer-events: auto !important;
       }
 
@@ -1082,6 +1134,8 @@ var BRIDGE_ENDPOINTS = {
   resetMefrp: "resetMefrp",
   saveMefrpConfig: "saveMefrpConfig",
   listMefrpNodes: "listMefrpNodes",
+  listMefrpTunnels: "listMefrpTunnels",
+  deleteMefrpTunnel: "deleteMefrpTunnel",
   setTunnelAutoStart: "setTunnelAutoStart",
   saveCustomTunnelConfig: "saveCustomTunnelConfig",
   saveExternalTunnel: "saveExternalTunnel",
@@ -1624,7 +1678,8 @@ var TunnelEntryCard = React.memo(function TunnelEntryCard2({
   onToggleAutoStart,
   onStart,
   onStop,
-  onReset
+  onReset,
+  onDelete
 }) {
   const [showQr, setShowQr] = React.useState(false);
   const hasUrl = Boolean(entry && entry.url);
@@ -1684,7 +1739,22 @@ var TunnelEntryCard = React.memo(function TunnelEntryCard2({
         React.createElement("button", {
           style: { ...s.btnGhost, flexShrink: 0, height: 28, padding: "0 12px", fontSize: 12 },
           onClick: () => onCopy && onCopy(entry.url)
-        }, copied ? "\u2713 \u5DF2\u590D\u5236" : "\u590D\u5236")
+        }, copied ? "\u2713 \u5DF2\u590D\u5236" : "\u590D\u5236"),
+        // 公网地址这一行的删除按钮：仅 mefrp 隧道提供（删掉的是 mefrp 后台的代理记录）。
+        // 放在地址旁而不是塞进「隧道配置」里，是因为用户看到地址的第一反应就是"这条不要了"。
+        onDelete && React.createElement("button", {
+          style: {
+            ...s.btnGhost,
+            flexShrink: 0,
+            height: 28,
+            padding: "0 12px",
+            fontSize: 12,
+            color: "var(--dsw-alias-state-error-primary,#dc2626)",
+            borderColor: "var(--dsw-alias-state-error-border,#fecaca)"
+          },
+          onClick: onDelete,
+          title: "\u5220\u9664\u8BE5 mefrp \u96A7\u9053\uFF08\u4E0D\u53EF\u64A4\u9500\uFF0C\u516C\u7F51\u5730\u5740\u7ACB\u5373\u5931\u6548\uFF09"
+        }, "\u5220\u9664\u96A7\u9053")
       ),
       // 状态细节（重连/错误/连接中）——无 URL 时格外重要，让用户知道隧道在自愈而非消失
       entry && entry.stateDetail && React.createElement("div", {
@@ -2072,7 +2142,7 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
     )
   );
 });
-var MefrpConfigForm = React.memo(function MefrpConfigForm2({ accessToken: initToken, nodeId: initNode, remotePort: initPort, nodes, onLoadNodes, onSave }) {
+var MefrpConfigForm = React.memo(function MefrpConfigForm2({ accessToken: initToken, nodeId: initNode, remotePort: initPort, nodes, onLoadNodes, onSave, tunnels, onLoadTunnels, onDeleteTunnel }) {
   const [open, setOpen] = React.useState(Boolean(initToken || initNode || initPort));
   const [tokenVal, setTokenVal] = React.useState(initToken || "");
   const [nodeVal, setNodeVal] = React.useState(initNode ? String(initNode) : "");
@@ -2081,6 +2151,9 @@ var MefrpConfigForm = React.memo(function MefrpConfigForm2({ accessToken: initTo
   const [msg, setMsg] = React.useState(null);
   const [nodeList, setNodeList] = React.useState(null);
   const [loadingNodes, setLoadingNodes] = React.useState(false);
+  const [tunnelList, setTunnelList] = React.useState(null);
+  const [loadingTunnels, setLoadingTunnels] = React.useState(false);
+  const [deletingId, setDeletingId] = React.useState(0);
   React.useEffect(() => {
     setTokenVal(initToken || "");
     setNodeVal(initNode ? String(initNode) : "");
@@ -2089,6 +2162,9 @@ var MefrpConfigForm = React.memo(function MefrpConfigForm2({ accessToken: initTo
   React.useEffect(() => {
     if (Array.isArray(nodes)) setNodeList(nodes);
   }, [nodes]);
+  React.useEffect(() => {
+    if (Array.isArray(tunnels)) setTunnelList(tunnels);
+  }, [tunnels]);
   const loadNodes = async () => {
     setLoadingNodes(true);
     setMsg(null);
@@ -2102,6 +2178,38 @@ var MefrpConfigForm = React.memo(function MefrpConfigForm2({ accessToken: initTo
       setLoadingNodes(false);
     }
   };
+  const loadTunnels = async () => {
+    setLoadingTunnels(true);
+    setMsg(null);
+    try {
+      const list = await onLoadTunnels(tokenVal);
+      setTunnelList(Array.isArray(list) ? list : []);
+      if (!list || !list.length) setMsg({ ok: true, text: "\u540E\u53F0\u6CA1\u6709\u96A7\u9053" });
+    } catch (e) {
+      setMsg({ ok: false, text: e.message || "\u52A0\u8F7D\u96A7\u9053\u5217\u8868\u5931\u8D25" });
+    } finally {
+      setLoadingTunnels(false);
+    }
+  };
+  const handleDeleteTunnel = async (t) => {
+    const label = [t.proxyName || "\u96A7\u9053 #" + t.proxyId, t.url].filter(Boolean).join("\n");
+    const extra = t.active ? "\n\n\u26A0\uFE0F \u8FD9\u662F**\u5F53\u524D\u6B63\u5728\u4F7F\u7528**\u7684\u96A7\u9053\uFF0C\u5220\u9664\u540E\u4F1A\u540C\u65F6\u5173\u95ED\u96A7\u9053\uFF0C\u516C\u7F51\u5730\u5740\u7ACB\u5373\u5931\u6548\u3002" : "";
+    if (!window.confirm("\u786E\u8BA4\u5220\u9664\u8BE5 mefrp \u96A7\u9053\uFF1F\u6B64\u64CD\u4F5C\u4E0D\u53EF\u64A4\u9500\u3002\n\n" + label + extra)) return;
+    setDeletingId(t.proxyId);
+    setMsg(null);
+    try {
+      await onDeleteTunnel(t.proxyId, tokenVal);
+      setTunnelList((prev) => Array.isArray(prev) ? prev.filter((x) => x.proxyId !== t.proxyId) : prev);
+      setMsg({ ok: true, text: "\u2713 \u5DF2\u5220\u9664\u96A7\u9053 #" + t.proxyId });
+    } catch (e) {
+      setMsg({ ok: false, text: e.message || "\u5220\u9664\u96A7\u9053\u5931\u8D25" });
+    } finally {
+      setDeletingId(0);
+    }
+  };
+  React.useEffect(() => {
+    if (open && tunnelList == null && initToken) loadTunnels();
+  }, [open]);
   const rowStyle = (selected, offline) => ({
     display: "flex",
     alignItems: "center",
@@ -2274,6 +2382,111 @@ var MefrpConfigForm = React.memo(function MefrpConfigForm2({ accessToken: initTo
           value: portVal,
           onChange: (e) => setPortVal(e.target.value)
         })
+      ),
+      // ── 隧道列表：mefrp 后台的**全部**隧道（含历次崩溃/重启留下的孤儿隧道），可逐条删除 ──
+      // 背景：MefrpManager.stop() 会删掉自己创建的代理，但进程被强杀 / 插件重启导致内存里的
+      // createdProxy 丢失时，代理就永远留在服务端了。免费账号名额有限（默认 2 个），
+      // 反复重试几次就会把名额占满（之后开启会直接报「名额已满」），所以必须给用户一个清理入口。
+      React.createElement(
+        "div",
+        { style: { marginBottom: 8 } },
+        React.createElement(
+          "div",
+          {
+            style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8, marginBottom: 6 }
+          },
+          React.createElement(
+            "span",
+            { style: { fontSize: 12, color: "var(--dsw-alias-label-secondary,#4b5563)" } },
+            "\u96A7\u9053\u5217\u8868\uFF1A",
+            React.createElement(
+              "span",
+              { style: { color: "var(--dsw-alias-label-primary,#0f1115)", fontWeight: 500 } },
+              Array.isArray(tunnelList) ? tunnelList.length + " \u6761" : "\u672A\u52A0\u8F7D"
+            )
+          ),
+          React.createElement("button", {
+            type: "button",
+            style: { ...s.btnGhost, height: 24, fontSize: 11, padding: "0 10px", flexShrink: 0 },
+            disabled: loadingTunnels,
+            onClick: loadTunnels
+          }, loadingTunnels ? "\u52A0\u8F7D\u4E2D\u2026" : "\u{1F504} \u5237\u65B0\u96A7\u9053\u5217\u8868")
+        ),
+        React.createElement("div", {
+          style: { fontSize: 11, color: "var(--dsw-alias-label-tertiary,#8b93a1)", marginBottom: 6, lineHeight: 1.5 }
+        }, "\u5220\u9664\u4E0D\u518D\u4F7F\u7528\u7684\u65E7\u96A7\u9053\u53EF\u91CA\u653E\u540D\u989D\uFF08\u514D\u8D39\u8D26\u53F7\u540D\u989D\u6709\u9650\uFF09\u3002\u5F02\u5E38\u9000\u51FA\u7559\u4E0B\u7684\u96A7\u9053\u4E0D\u4F1A\u81EA\u52A8\u6E05\u7406\uFF0C\u4F1A\u4E00\u76F4\u5360\u7740\u540D\u989D\u3002"),
+        Array.isArray(tunnelList) && tunnelList.length === 0 && React.createElement("div", {
+          style: { fontSize: 12, color: "var(--dsw-alias-label-tertiary,#8b93a1)", padding: "6px 2px" }
+        }, "\u6682\u65E0\u96A7\u9053"),
+        Array.isArray(tunnelList) && tunnelList.length > 0 && React.createElement(
+          "div",
+          {
+            style: {
+              maxHeight: 220,
+              overflowY: "auto",
+              borderRadius: 8,
+              border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)",
+              background: "var(--dsw-alias-bg-layer-1,#fff)"
+            }
+          },
+          tunnelList.map((t) => React.createElement(
+            "div",
+            {
+              key: t.proxyId,
+              style: {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 8,
+                padding: "7px 10px",
+                fontSize: 12,
+                borderBottom: "1px solid var(--dsw-alias-border-l2,#eef0f3)"
+              }
+            },
+            React.createElement(
+              "div",
+              { style: { minWidth: 0, flex: "1 1 auto" } },
+              React.createElement("div", {
+                style: { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", color: "var(--dsw-alias-label-primary,#0f1115)" },
+                title: t.proxyName || ""
+              }, t.proxyName || "\u96A7\u9053 #" + t.proxyId),
+              React.createElement("div", {
+                style: { fontSize: 11, color: "var(--dsw-alias-label-tertiary,#6b7280)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 },
+                title: t.url || ""
+              }, (t.url || "\u5730\u5740\u672A\u77E5") + " \xB7 \u8282\u70B9 #" + t.nodeId + " \xB7 \u672C\u5730\u7AEF\u53E3 " + t.localPort)
+            ),
+            React.createElement(
+              "span",
+              { style: { display: "flex", alignItems: "center", gap: 6, flexShrink: 0 } },
+              t.active && React.createElement("span", {
+                style: {
+                  fontSize: 10,
+                  lineHeight: 1.6,
+                  padding: "1px 6px",
+                  borderRadius: 999,
+                  background: "var(--dsw-alias-state-success-bg,#dcfce7)",
+                  color: "var(--dsw-alias-state-success-primary,#059669)"
+                }
+              }, "\u5F53\u524D"),
+              React.createElement("button", {
+                type: "button",
+                style: {
+                  ...s.btnGhost,
+                  height: 24,
+                  fontSize: 11,
+                  padding: "0 10px",
+                  flexShrink: 0,
+                  color: "var(--dsw-alias-state-error-primary,#dc2626)",
+                  borderColor: "var(--dsw-alias-state-error-border,#fecaca)",
+                  opacity: deletingId === t.proxyId ? 0.5 : 1
+                },
+                disabled: deletingId === t.proxyId,
+                onClick: () => handleDeleteTunnel(t),
+                title: "\u5220\u9664\u8BE5\u96A7\u9053\uFF08\u4E0D\u53EF\u64A4\u9500\uFF09"
+              }, deletingId === t.proxyId ? "\u5220\u9664\u4E2D\u2026" : "\u5220\u9664")
+            )
+          ))
+        )
       ),
       React.createElement(
         "div",
@@ -4940,6 +5153,18 @@ function BridgePanel({ rpcCall }) {
     setStatus(r.value);
     return r.value?.mefrpNodes ?? [];
   }, [authRpcCall]);
+  const loadMefrpTunnels = React.useCallback(async (accessToken) => {
+    const r = await authRpcCall(BRIDGE_ENDPOINTS.listMefrpTunnels, { accessToken });
+    if (!r?.ok) throw new Error(r?.error?.message ?? "\u52A0\u8F7D\u96A7\u9053\u5217\u8868\u5931\u8D25");
+    setStatus(r.value);
+    return r.value?.mefrpTunnels ?? [];
+  }, [authRpcCall]);
+  const deleteMefrpTunnel = React.useCallback(async (proxyId, accessToken) => {
+    const r = await authRpcCall(BRIDGE_ENDPOINTS.deleteMefrpTunnel, { proxyId, accessToken });
+    if (!r?.ok) throw new Error(r?.error?.message ?? "\u5220\u9664\u96A7\u9053\u5931\u8D25");
+    setStatus(r.value);
+    return true;
+  }, [authRpcCall]);
   const onSelectLanIp = React.useCallback((ip) => act(BRIDGE_ENDPOINTS.setLanIp, { ip }), [act]);
   const onStartCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.startCustomTunnel), [act]);
   const onStopCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.stopCustomTunnel), [act]);
@@ -5035,7 +5260,13 @@ function BridgePanel({ rpcCall }) {
         onToggleAutoStart: onToggleMefrpAutoStart,
         onStart: onStartMefrp,
         onStop: onStopMefrp,
-        onReset: onResetMefrp
+        onReset: onResetMefrp,
+        // 公网地址行的删除按钮：删的是 mefrp 后台的代理记录（不可撤销）。
+        // mf.proxyId 只有本次运行真的创建了代理才存在，缺失就不给按钮。
+        onDelete: mf.proxyId ? () => {
+          if (!window.confirm("\u786E\u8BA4\u5220\u9664\u5F53\u524D mefrp \u96A7\u9053\uFF1F\n\n\u5220\u9664\u540E\u516C\u7F51\u5730\u5740\u7ACB\u5373\u5931\u6548\uFF0C\u96A7\u9053\u4E5F\u4F1A\u88AB\u5173\u95ED\u3002")) return;
+          deleteMefrpTunnel(mf.proxyId, mf.token || "").then(() => setErr(null)).catch((e) => setErr(e.message || "\u5220\u9664\u96A7\u9053\u5931\u8D25"));
+        } : void 0
       },
       ext && ext.configured && ext.url && {
         key: "external",
@@ -5059,7 +5290,8 @@ function BridgePanel({ rpcCall }) {
         onToggleAutoStart: primary ? primary.onToggleAutoStart : void 0,
         onStart: primary ? primary.onStart : cf ? onStartCloudflared : null,
         onStop: primary ? primary.onStop : void 0,
-        onReset: primary ? primary.onReset : void 0
+        onReset: primary ? primary.onReset : void 0,
+        onDelete: primary ? primary.onDelete : void 0
       }),
       otherCount > 0 && React.createElement("div", {
         style: { ...s.muted, fontSize: 11, marginBottom: 8, textAlign: "center" }
@@ -5117,7 +5349,10 @@ function BridgePanel({ rpcCall }) {
             remotePort: mf && mf.remotePort || 0,
             nodes: status && status.mefrpNodes,
             onLoadNodes: loadMefrpNodes,
-            onSave: saveMefrpConfig
+            onSave: saveMefrpConfig,
+            tunnels: status && status.mefrpTunnels,
+            onLoadTunnels: loadMefrpTunnels,
+            onDeleteTunnel: deleteMefrpTunnel
           })
         ),
         React.createElement(
@@ -5634,10 +5869,31 @@ function setupMobileExperience(rpcCall, ctx) {
       const dshNewBtn = document.querySelector('button[aria-label="\u65B0\u5EFA\u4F1A\u8BDD"]');
       if (dshNewBtn) dshNewBtn.click();
     };
+    const extrasSlot = document.createElement("div");
+    extrasSlot.className = "dsh-mobile-header-extras";
+    const extrasLeftSlot = document.createElement("div");
+    extrasLeftSlot.className = "dsh-mobile-header-extras-left";
     header.appendChild(leftBtn);
+    header.appendChild(extrasLeftSlot);
     header.appendChild(titleEl);
+    header.appendChild(extrasSlot);
     header.appendChild(rightBtn);
     document.body.appendChild(header);
+  } else {
+    if (!header.querySelector(".dsh-mobile-header-extras")) {
+      const slot = document.createElement("div");
+      slot.className = "dsh-mobile-header-extras";
+      const newBtn = header.querySelector(".dsh-header-new-btn");
+      if (newBtn) header.insertBefore(slot, newBtn);
+      else header.appendChild(slot);
+    }
+    if (!header.querySelector(".dsh-mobile-header-extras-left")) {
+      const slotL = document.createElement("div");
+      slotL.className = "dsh-mobile-header-extras-left";
+      const menuBtn = header.querySelector(".dsh-header-menu-btn");
+      if (menuBtn && menuBtn.parentNode === header) header.insertBefore(slotL, menuBtn.nextSibling);
+      else header.insertBefore(slotL, header.firstChild);
+    }
   }
   const syncMobileTitle = () => {
     if (!titleEl) titleEl = document.querySelector(".dsh-mobile-header-title");
@@ -5800,11 +6056,12 @@ function setupMobileExperience(rpcCall, ctx) {
     const deltaX = e.changedTouches[0].clientX - touchStartX;
     const deltaY = e.changedTouches[0].clientY - touchStartY;
     if (Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
-      if (deltaX > 0 && touchStartX <= 35) {
+      const viewportW = window.innerWidth;
+      if (deltaX < 0 && touchStartX >= viewportW - 35) {
         document.body.classList.add("dsh-drawer-open");
         const collapsedToggle = document.querySelector('div[class*="hHd-Xa_collapsed"] button[class*="hHd-Xa_toggle"]');
         if (collapsedToggle) collapsedToggle.click();
-      } else if (deltaX < 0 && document.body.classList.contains("dsh-drawer-open")) {
+      } else if (deltaX > 0 && document.body.classList.contains("dsh-drawer-open")) {
         document.body.classList.remove("dsh-drawer-open");
       }
     }
